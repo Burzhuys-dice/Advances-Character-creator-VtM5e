@@ -1,0 +1,659 @@
+async function init() {
+    await fetchAllData();
+    
+    Object.keys(disciplinesData).forEach(d => {
+        if(state.disciplines[d] === undefined) state.disciplines[d] = 0;
+    });
+    Object.values(attributesData).flat().forEach(a => {
+        if(state.attributes[a.id] === undefined) state.attributes[a.id] = 1;
+    });
+    Object.values(skillsData).flat().forEach(s => {
+        if(state.skills[s.id] === undefined) state.skills[s.id] = 0;
+    });
+
+    populateClanSelects();
+    changeClan(Object.keys(clansData)[0] || 'unknown'); 
+    renderAttributes();
+    renderSkills();
+    populateCustomSpecDropdown();
+    updateTrackers();
+    updateHumanityDisplay();
+    
+    document.getElementById('loading-status').innerText = 'Крок за кроком (Дані завантажено)';
+}
+
+async function fetchAllData() {
+    try {
+        const [advRes, predRes, coreRes, clansRes, discRes] = await Promise.all([
+            fetch('https://raw.githubusercontent.com/Burzhuys-dice/VtM_character_creation_UA/refs/heads/main/vtm_merits_data.json'),
+            fetch('https://raw.githubusercontent.com/Burzhuys-dice/VtM_character_creation_UA/refs/heads/main/vtm_predator-types_1'),
+            fetch('https://raw.githubusercontent.com/Burzhuys-dice/VtM_character_creation_UA/refs/heads/main/vtm_char_and_skills'),
+            fetch('https://raw.githubusercontent.com/Burzhuys-dice/VtM_character_creation_UA/refs/heads/main/vtm_clans'),
+            fetch('https://raw.githubusercontent.com/Burzhuys-dice/VtM_character_creation_UA/refs/heads/main/vtm_disciplines')
+        ]);
+
+        if(advRes.ok) state.advantagesData = await advRes.json();
+        renderAvailableAdvantages();
+
+        if(predRes.ok) state.predatorData = await predRes.json();
+        renderPredatorTypes();
+
+        if(coreRes.ok) {
+            const coreData = await coreRes.json();
+            if(coreData.attributes) attributesData = coreData.attributes;
+            if(coreData.skills) {
+                if(coreData.skills.physical) skillsData.physical = coreData.skills.physical;
+                if(coreData.skills.social) skillsData.social = coreData.skills.social;
+                if(coreData.skills.mental) skillsData.mental = coreData.skills.mental;
+            }
+        }
+
+        if(clansRes.ok) {
+            const cData = await clansRes.json();
+            if(cData && Object.keys(cData).length > 0) clansData = cData;
+        }
+
+        if(discRes.ok) {
+            const dJson = await discRes.json();
+            
+            Object.keys(disciplinesData).forEach(k => disciplinesPowersMap[k] = []);
+
+            let rawPowers = dJson.powers || (Array.isArray(dJson) ? dJson : []);
+            if (Array.isArray(rawPowers)) {
+                rawPowers.forEach(power => {
+                    let dKey = power.disc;
+                    if (dKey && disciplinesPowersMap[dKey]) {
+                        disciplinesPowersMap[dKey].push({
+                            id: power.ability_name || power.name,
+                            name: power.ability_name || power.name,
+                            level: Number(power.level || 1),
+                            desc: power.effect_description || power.desc || '',
+                            requirement: power.requirement || 'Немає',
+                            rouseCost: power.rouse_cost || '',
+                            dicePool: power.dice_pool || '',
+                            resistance: power.resistance || ''
+                        });
+                    }
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Помилка завантаження даних:', error);
+        document.getElementById('loading-status').innerText = 'Помилка завантаження даних';
+    }
+}
+
+function renderPredatorTypes() {
+    const grid = document.getElementById('predator-grid');
+    if (state.predatorData.length === 0) return;
+
+    let html = '';
+    state.predatorData.forEach(predator => {
+        const isSelected = state.selectedPredator === predator.id;
+        
+        let optionsHtml = '';
+        if (isSelected) {
+            let discOpts = (predator.discipline_options || []).map(opt => `
+                <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 p-1.5 rounded border border-transparent hover:border-gray-200 transition-colors" onclick="event.stopPropagation()">
+                    <input type="radio" name="pred_disc" value="${opt.id}" 
+                        onchange="setPredatorChoice('discipline', '${opt.id}')"
+                        ${state.predatorChoices.discipline === opt.id ? 'checked' : ''} class="accent-[#4b0082]">
+                    ${opt.name}
+                </label>
+            `).join('');
+
+            let skillOpts = (predator.skill_options || []).map(opt => `
+                <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 p-1.5 rounded border border-transparent hover:border-gray-200 transition-colors" onclick="event.stopPropagation()">
+                    <input type="radio" name="pred_skill" value="${opt.id}" 
+                        onchange="setPredatorChoice('skill', '${opt.id}', '${opt.spec}')"
+                        ${state.predatorChoices.skill === opt.id && state.predatorChoices.specName === opt.spec ? 'checked' : ''} class="accent-[#4b0082]">
+                    ${opt.name}
+                </label>
+            `).join('');
+
+            optionsHtml = `
+                <div class="mt-4 pt-4 border-t border-purple-100 animate-[fadeIn_0.3s_ease-in-out]">
+                    <div class="mb-3">
+                        <span class="block text-[11px] font-bold text-[#4b0082] uppercase tracking-widest mb-1">Оберіть дисципліну (+1 крапка)</span>
+                        <div class="flex flex-col gap-1">${discOpts}</div>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] font-bold text-[#4b0082] uppercase tracking-widest mb-1">Оберіть спеціалізацію (+1 крапка)</span>
+                        <div class="flex flex-col gap-1">${skillOpts}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        const modifierSymbol = (predator.humanity_modifier > 0) ? '+' : '';
+        const modifierText = predator.humanity_modifier !== 0 ? `Людяність ${modifierSymbol}${predator.humanity_modifier}` : 'Людяність незмінна';
+
+        html += `
+            <div class="predator-card flex flex-col bg-white p-5 rounded-xl shadow-sm cursor-pointer ${isSelected ? 'selected' : 'border-gray-200 hover:border-gray-300'}" 
+                 onclick="selectPredator('${predator.id}')">
+                <div class="flex justify-between items-start mb-3 gap-2">
+                    <h3 class="font-serif font-bold text-lg text-[#1a1a1a] leading-tight">${predator.name}</h3>
+                    <span class="text-[10px] font-bold px-2 py-1 rounded bg-gray-100 text-gray-700 min-w-max text-right">${modifierText}</span>
+                </div>
+                <p class="text-xs text-gray-600 mb-3 flex-grow text-justify">${predator.description}</p>
+                <div class="bg-purple-50 p-2 rounded text-[11px] font-bold text-indigo-800 border border-purple-100">${predator.advantages_text || 'Немає додаткових благ/вад'}</div>
+                ${optionsHtml}
+            </div>
+        `;
+    });
+    grid.innerHTML = html;
+}
+
+function selectPredator(id) {
+    if (state.selectedPredator !== id) {
+        state.selectedPredator = id;
+        state.predatorChoices = { discipline: null, skill: null, specName: null };
+        
+        const predator = state.predatorData.find(p => p.id === id);
+        if (predator) {
+            if (predator.discipline_options && predator.discipline_options.length > 0) {
+                state.predatorChoices.discipline = predator.discipline_options[0].id;
+            }
+            if (predator.skill_options && predator.skill_options.length > 0) {
+                state.predatorChoices.skill = predator.skill_options[0].id;
+                state.predatorChoices.specName = predator.skill_options[0].spec;
+            }
+        }
+        
+        renderPredatorTypes();
+        applyPredatorGlobalUpdates();
+    }
+}
+
+function setPredatorChoice(type, id, specName = null) {
+    if (type === 'discipline') state.predatorChoices.discipline = id;
+    if (type === 'skill') {
+        state.predatorChoices.skill = id;
+        state.predatorChoices.specName = specName;
+    }
+    if (event) event.stopPropagation();
+    applyPredatorGlobalUpdates();
+}
+
+function applyPredatorGlobalUpdates() {
+    updateHumanityDisplay();
+    renderDisciplines();
+    renderSkills();
+    renderPredatorAdvantagesInfo();
+    
+    const specDisplay = document.getElementById('predator-spec-display');
+    if (state.selectedPredator && state.predatorChoices.specName) {
+        specDisplay.innerText = `Спеціалізація хижака: ${state.predatorChoices.specName}`;
+        specDisplay.classList.remove('hidden');
+    } else {
+        specDisplay.classList.add('hidden');
+    }
+}
+
+function renderPredatorAdvantagesInfo() {
+    const infoDiv = document.getElementById('predator-adv-info');
+    if (!infoDiv) return;
+    
+    if (state.selectedPredator) {
+        const predator = state.predatorData.find(p => p.id === state.selectedPredator);
+        if (predator && predator.advantages_text) {
+            infoDiv.innerHTML = `
+                <div class="bg-[#f8f5ff] border-l-4 border-[#4b0082] text-indigo-900 p-4 rounded shadow-sm">
+                    <h4 class="font-bold text-sm uppercase tracking-widest mb-1 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-[#4b0082] rounded-full inline-block"></span> Бонус вашого хижака
+                    </h4>
+                    <p class="text-sm font-medium">${predator.advantages_text}</p>
+                    <p class="text-xs opacity-70 mt-1">Оберіть відповідні блага/вади зі списку нижче вручну, враховуючи цю вимогу.</p>
+                </div>
+            `;
+            infoDiv.classList.remove('hidden');
+        } else {
+            infoDiv.classList.add('hidden');
+        }
+    } else {
+        infoDiv.classList.add('hidden');
+    }
+}
+
+function updateHumanityDisplay() {
+    let currentHumanity = 7;
+    if (state.selectedPredator) {
+        const predator = state.predatorData.find(p => p.id === state.selectedPredator);
+        if (predator && predator.humanity_modifier) {
+            currentHumanity += predator.humanity_modifier;
+        }
+    }
+    document.getElementById('humanity-display').innerText = currentHumanity;
+}
+
+function createDotsHTML(type, id, baseValue, maxDots = 5, bonusValue = 0) {
+    let html = '<div class="dot-container">';
+    let totalValue = baseValue + bonusValue;
+    if (totalValue > maxDots) totalValue = maxDots; 
+    
+    for (let i = 1; i <= maxDots; i++) {
+        let dotClass = '';
+        if (i <= baseValue) dotClass = 'filled';
+        else if (i <= totalValue) dotClass = 'predator';
+        
+        const min = type === 'attribute' ? 1 : 0;
+        html += `<div class="dot ${dotClass}" onclick="handleDotClick('${type}', '${id}', ${i}, ${baseValue}, ${min})"></div>`;
+    }
+    html += '</div>';
+    return html;
+}
+
+function handleDotClick(type, id, clickedIndex, baseValue, min) {
+    let newValue = clickedIndex;
+    if (clickedIndex === baseValue && baseValue > min) {
+        newValue = clickedIndex - 1;
+    }
+    
+    if (type === 'attribute') {
+        state.attributes[id] = newValue;
+        renderAttributes();
+    } else if (type === 'skill') {
+        state.skills[id] = newValue;
+        renderSkills();
+    } else if (type === 'discipline') {
+        state.disciplines[id] = newValue;
+        renderDisciplines();
+    }
+    updateTrackers();
+}
+
+function renderDisciplines() {
+    const grid = document.getElementById('disciplines-grid');
+    let availableDisc = [...(clansData[state.clan]?.disciplines || [])];
+    
+    if (state.predatorChoices.discipline && !availableDisc.includes(state.predatorChoices.discipline)) {
+        availableDisc.push(state.predatorChoices.discipline);
+    }
+    
+    let html = '<div class="space-y-6 bg-white p-6 border border-gray-200 rounded-lg">';
+    
+    if(availableDisc.length === 0) {
+        html += '<p class="text-gray-500">Для цього клану немає доступних дисциплін у базі.</p>';
+    }
+
+    availableDisc.forEach(discKey => {
+        const discInfo = disciplinesData[discKey] || { name: discKey, desc: 'Опис відсутній' };
+        const ukrName = discInfo.name || discKey; 
+        let bonus = (state.predatorChoices.discipline === discKey) ? 1 : 0;
+        let baseDots = state.disciplines[discKey] || 0;
+        let totalDots = baseDots + bonus;
+        
+        if(!state.disciplinePowers[discKey]) state.disciplinePowers[discKey] = {};
+
+        html += `
+            <div class="group border-b border-gray-100 pb-6 last:border-0 last:pb-0">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-serif text-xl font-bold text-gray-800 group-hover:text-[#8b0000] transition-colors">${ukrName}</span>
+                    ${createDotsHTML('discipline', discKey, baseDots, 5, bonus)}
+                </div>
+                <p class="text-sm text-gray-500 text-justify leading-relaxed mb-4">${discInfo.desc || ''}</p>
+        `;
+
+        if (totalDots > 0) {
+            html += `<div class="bg-gray-50 border-l-2 border-[#8b0000] p-4 rounded-r-lg space-y-4">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-gray-800">Вибір здібностей</h4>`;
+            
+            let powersList = disciplinesPowersMap[discKey] || [];
+
+            for (let dotLevel = 1; dotLevel <= totalDots; dotLevel++) {
+                let availablePowers = powersList.filter(p => Number(p.level) <= dotLevel);
+                
+                let optionsHtml = `<option value="">-- Оберіть здібність (макс. рівень ${dotLevel}) --</option>`;
+                availablePowers.forEach(p => {
+                    let isSelected = state.disciplinePowers[discKey][dotLevel] === p.id;
+                    optionsHtml += `<option value="${p.id}" ${isSelected ? 'selected' : ''}>Рівень ${p.level}: ${p.name}</option>`;
+                });
+
+                let selectedDesc = '';
+                let selectedPowerId = state.disciplinePowers[discKey][dotLevel];
+                if (selectedPowerId) {
+                    let foundPower = availablePowers.find(p => p.id === selectedPowerId);
+                    if (foundPower) {
+                        selectedDesc = `
+                            <div class="mt-2 text-xs text-gray-600 bg-white p-2.5 rounded border border-gray-100 space-y-1">
+                                <p class="italic leading-snug">${foundPower.desc}</p>
+                                ${foundPower.rouseCost ? `<p><strong>Збурення:</strong> ${foundPower.rouseCost}</p>` : ''}
+                                ${foundPower.dicePool ? `<p><strong>Пул кубиків:</strong> ${foundPower.dicePool}</p>` : ''}
+                                ${foundPower.resistance ? `<p><strong>Опір:</strong> ${foundPower.resistance}</p>` : ''}
+                            </div>
+                        `;
+                    }
+                }
+
+                html += `
+                    <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">Здібність за ${dotLevel}-ю крапку</label>
+                        <select onchange="setDisciplinePower('${discKey}', ${dotLevel}, this.value)" class="w-full bg-gray-50 border border-gray-300 rounded px-2 py-1.5 text-sm font-semibold text-gray-800 outline-none focus:border-[#8b0000]">
+                            ${optionsHtml}
+                        </select>
+                        ${selectedDesc}
+                    </div>
+                `;
+            }
+            html += `</div>`;
+        }
+        
+        html += `</div>`;
+    });
+    html += '</div>';
+    grid.innerHTML = html;
+}
+
+function setDisciplinePower(discKey, dotLevel, powerId) {
+    if(!state.disciplinePowers[discKey]) state.disciplinePowers[discKey] = {};
+    state.disciplinePowers[discKey][dotLevel] = powerId;
+    renderDisciplines();
+}
+
+function renderAttributes() {
+    const grid = document.getElementById('attributes-grid');
+    grid.innerHTML = '';
+    const categories = [
+        { key: 'physical', label: 'Фізичні' },
+        { key: 'social', label: 'Соціальні' },
+        { key: 'mental', label: 'Ментальні' }
+    ];
+    categories.forEach(cat => {
+        let colHTML = `<div><h3 class="text-xl font-bold text-gray-800 border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-wider">${cat.label}</h3><div class="space-y-4">`;
+        (attributesData[cat.key] || []).forEach(attr => {
+            colHTML += `
+                <div class="flex justify-between items-center group">
+                    <span class="font-serif text-lg text-gray-700 group-hover:text-[#8b0000] transition-colors">${attr.name}</span>
+                    ${createDotsHTML('attribute', attr.id, state.attributes[attr.id], 5, 0)}
+                </div>
+            `;
+        });
+        colHTML += `</div></div>`;
+        grid.innerHTML += colHTML;
+    });
+}
+
+function renderSkills() {
+    const grid = document.getElementById('skills-grid');
+    grid.innerHTML = '';
+    const categories = [
+        { key: 'physical', label: 'Фізичні' },
+        { key: 'social', label: 'Соціальні' },
+        { key: 'mental', label: 'Ментальні' }
+    ];
+    categories.forEach(cat => {
+        let colHTML = `<div><h3 class="text-xl font-bold text-gray-800 border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-wider">${cat.label}</h3><div class="space-y-3">`;
+        (skillsData[cat.key] || []).forEach(skill => {
+            let bonus = (state.predatorChoices.skill === skill.id) ? 1 : 0;
+            
+            colHTML += `
+                <div class="flex justify-between items-center group">
+                    <span class="font-serif text-base text-gray-700 group-hover:text-[#8b0000] transition-colors">${skill.name}</span>
+                    ${createDotsHTML('skill', skill.id, state.skills[skill.id], 5, bonus)}
+                </div>
+            `;
+        });
+        colHTML += `</div></div>`;
+        grid.innerHTML += colHTML;
+    });
+}
+
+function parseDotOptions(costStr) {
+    const str = String(costStr).trim();
+    
+    // 1. Окремі дискретні опції (через кому або слеш)
+    if (str.includes(',') || str.includes('/')) {
+        return str.split(/[,/]/).map(part => part.replace(/[^•]/g, '').length).filter(n => n > 0);
+    }
+    
+    // 2. Неперервний діапазон (дефіс)
+    if (str.includes('-')) {
+        const parts = str.split('-');
+        let min = parts[0].replace(/[^•]/g, '').length;
+        let max = parts[parts.length - 1].replace(/[^•]/g, '').length;
+        let res = [];
+        for(let i = min; i <= max; i++) res.push(i);
+        return res;
+    } 
+    
+    // 3. Від певної кількості крапок і вище (+)
+    if (str.includes('+')) {
+        let min = str.replace(/[^•]/g, '').length;
+        let res = [];
+        for(let i = min; i <= 5; i++) res.push(i); 
+        return res;
+    }
+    
+    // 4. Фіксована кількість
+    let count = str.replace(/[^•]/g, '').length;
+    return [count > 0 ? count : 1];
+}
+
+function renderAvailableAdvantages() {
+    const container = document.getElementById('available-advantages');
+    if (state.advantagesData.length === 0) return;
+
+    const searchQuery = document.getElementById('adv-search').value.toLowerCase();
+    const filterType = document.getElementById('adv-type-filter').value;
+
+    const filtered = state.advantagesData.filter(item => {
+        const matchesSearch = item.name.toLowerCase().includes(searchQuery) || item.desc.toLowerCase().includes(searchQuery);
+        const matchesType = filterType === 'all' || item.type === filterType;
+        return matchesSearch && matchesType;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-gray-400 text-center py-4">Нічого не знайдено...</div>`;
+        return;
+    }
+
+    let html = '';
+    filtered.forEach(item => {
+        let badgeClass = 'bg-gray-100 text-gray-700';
+        let titleColor = 'text-gray-800';
+        let typeLabel = 'Благо';
+        if (item.type === 'merit') { badgeClass = 'bg-red-100 text-red-800'; titleColor = 'text-red-800'; typeLabel = 'Чеснота'; } 
+        else if (item.type === 'flaw') { badgeClass = 'bg-gray-800 text-white'; titleColor = 'text-gray-900'; typeLabel = 'Вада'; } 
+        else if (item.type === 'background') { badgeClass = 'bg-blue-100 text-blue-800'; titleColor = 'text-blue-800'; typeLabel = 'Надбання'; }
+
+        const options = parseDotOptions(item.cost);
+        let actionButtons = '';
+        options.forEach(cost => {
+            const isAlreadySelected = state.selectedAdvantages.some(s => s.id === item.id && s.cost === cost);
+            actionButtons += `
+                <button onclick="addAdvantage(${item.id}, ${cost})" 
+                    class="px-2 py-1 text-xs font-bold rounded border transition-colors 
+                    ${isAlreadySelected ? 'bg-gray-200 border-gray-300 text-gray-500 cursor-not-allowed' : 'bg-white border-gray-300 hover:bg-gray-100'}">
+                    + ${cost} ⬤
+                </button>
+            `;
+        });
+
+        html += `
+            <div class="border-b border-gray-100 pb-4 last:border-0">
+                <div class="flex justify-between items-start mb-1 gap-2">
+                    <div>
+                        <span class="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${badgeClass}">${typeLabel} | ${item.category}</span>
+                        <h4 class="font-serif font-bold text-base ${titleColor} mt-1">${item.name}</h4>
+                    </div>
+                    <div class="flex flex-wrap gap-1 justify-end min-w-max">
+                        ${actionButtons}
+                    </div>
+                </div>
+                <p class="text-xs text-gray-600 leading-snug">${item.desc}</p>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+function renderSelectedAdvantages() {
+    const container = document.getElementById('selected-advantages');
+    if (state.selectedAdvantages.length === 0) {
+        container.innerHTML = `<div class="text-gray-400 text-center py-10">Ви ще не обрали жодного блага чи вади.</div>`;
+        return;
+    }
+
+    let html = '';
+    state.selectedAdvantages.forEach((sel, index) => {
+        let badgeClass = sel.type === 'flaw' ? 'bg-gray-800 text-white' : 'bg-red-100 text-red-800';
+        
+        html += `
+            <div class="bg-white border border-gray-200 p-3 rounded-lg shadow-sm flex justify-between items-center animate-[fadeIn_0.3s_ease-in-out]">
+                <div>
+                    <span class="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${badgeClass}">
+                        ${sel.type === 'flaw' ? 'Вада' : 'Благо'}
+                    </span>
+                    <h4 class="font-serif font-bold text-sm text-gray-800 mt-1">${sel.name}</h4>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="font-bold text-sm text-gray-700">${sel.cost} ⬤</span>
+                    <button onclick="removeAdvantage(${index})" class="text-red-500 hover:text-red-700 p-1 font-bold text-lg leading-none">&times;</button>
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+function addAdvantage(id, cost) {
+    const item = state.advantagesData.find(i => i.id === id);
+    if (!item) return;
+    if (state.selectedAdvantages.some(s => s.id === id && s.cost === cost)) return;
+
+    state.selectedAdvantages.push({ id: item.id, name: item.name, type: item.type, cost: cost });
+    renderAvailableAdvantages(); 
+    renderSelectedAdvantages();
+    updateTrackers();
+}
+
+function removeAdvantage(index) {
+    state.selectedAdvantages.splice(index, 1);
+    renderAvailableAdvantages();
+    renderSelectedAdvantages();
+    updateTrackers();
+}
+
+function populateClanSelects() {
+    let optionsHTML = '';
+    for (const [key, data] of Object.entries(clansData)) {
+        optionsHTML += `<option value="${key}">${data.name}</option>`;
+    }
+    document.getElementById('clan-select-1').innerHTML = optionsHTML;
+    document.getElementById('clan-select-4').innerHTML = optionsHTML;
+}
+
+function changeClan(clanId) {
+    state.clan = clanId;
+    document.getElementById('clan-select-1').value = clanId;
+    document.getElementById('clan-select-4').value = clanId;
+    document.getElementById('clan-desc-1').innerText = clansData[clanId]?.desc || '';
+    
+    Object.keys(state.disciplines).forEach(k => state.disciplines[k] = 0);
+    state.disciplinePowers = {}; 
+
+    renderDisciplines();
+    updateTrackers();
+}
+
+function populateCustomSpecDropdown() {
+    const select = document.getElementById('spec-custom-skill');
+    select.innerHTML = '<option value="">-- Оберіть навичку --</option>';
+    let allSkills = [];
+    Object.values(skillsData).forEach(arr => { allSkills = allSkills.concat(arr); });
+    allSkills.sort((a, b) => a.name.localeCompare(b.name));
+    allSkills.forEach(skill => {
+        select.innerHTML += `<option value="${skill.id}">${skill.name}</option>`;
+    });
+}
+
+function goToStep(step) {
+    document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+    document.getElementById(`step-${step}`).classList.add('active');
+
+    [1, 2, 3, 4, 5, 6].forEach(i => {
+        const btn = document.getElementById(`nav-step-${i}`);
+        if (i === step) {
+            btn.classList.add('bg-[#8b0000]', 'text-white');
+            btn.classList.remove('text-gray-500', 'hover:bg-gray-100');
+        } else {
+            btn.classList.remove('bg-[#8b0000]', 'text-white');
+            btn.classList.add('text-gray-500', 'hover:bg-gray-100');
+        }
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateTrackers() {
+    const discCounts = { 2: 0, 1: 0 };
+    Object.values(state.disciplines).forEach(val => {
+        if (val === 2) discCounts[2]++;
+        else if (val === 1) discCounts[1]++;
+        else if (val > 2) discCounts[2]++;
+    });
+    const discTracker = document.getElementById('disc-tracker');
+    discTracker.innerHTML = [2, 1].map(val => {
+        const isValid = discCounts[val] === 1;
+        return `<div class="px-3 py-1 rounded border tracker-badge ${isValid ? 'valid' : 'invalid'}">
+            ${val} ⬤ : ${discCounts[val]} / 1
+        </div>`;
+    }).join('');
+
+    const attrCounts = { 4: 0, 3: 0, 2: 0, 1: 0 };
+    Object.values(state.attributes).forEach(val => {
+        if (val >= 1 && val <= 4) attrCounts[val]++;
+    });
+    const attrTracker = document.getElementById('attr-tracker');
+    attrTracker.innerHTML = [4, 3, 2].map(val => {
+        const isValid = attrCounts[val] === attrTarget[val];
+        return `<div class="px-3 py-1 rounded border tracker-badge ${isValid ? 'valid' : 'invalid'}">
+            ${val} ⬤ : ${attrCounts[val]} / ${attrTarget[val]}
+        </div>`;
+    }).join('');
+
+    const skillCounts = { 4: 0, 3: 0, 2: 0, 1: 0 };
+    Object.values(state.skills).forEach(val => {
+        if (val >= 1 && val <= 4) skillCounts[val]++;
+    });
+    const target = skillTargets[state.distribution];
+    const skillTracker = document.getElementById('skill-tracker');
+    let skillHtml = '';
+    [4, 3, 2, 1].forEach(val => {
+        if (target[val] > 0 || skillCounts[val] > 0) {
+            const isValid = skillCounts[val] === target[val];
+            skillHtml += `<div class="px-3 py-1 rounded border tracker-badge ${isValid ? 'valid' : 'invalid'}">
+                ${val} ⬤ : ${skillCounts[val]} / ${target[val]}
+            </div>`;
+        }
+    });
+    skillTracker.innerHTML = skillHtml;
+
+    let totalMeritsDots = 0;
+    let totalFlawsDots = 0;
+    state.selectedAdvantages.forEach(adv => {
+        if (adv.type === 'flaw') totalFlawsDots += adv.cost;
+        else totalMeritsDots += adv.cost; 
+    });
+    const meritsEl = document.getElementById('merits-tracker');
+    const flawsEl = document.getElementById('flaws-tracker');
+
+    meritsEl.innerText = `${totalMeritsDots} / 7 ⬤`;
+    flawsEl.innerText = `${totalFlawsDots} / 2 ⬤`;
+    meritsEl.className = `px-3 py-1 text-sm font-bold rounded border tracker-badge ${totalMeritsDots === 7 ? 'valid' : 'invalid'}`;
+    flawsEl.className = `px-3 py-1 text-sm font-bold rounded border tracker-badge ${totalFlawsDots === 2 ? 'valid' : 'invalid'}`;
+}
+
+function changeSkillDistribution() {
+    state.distribution = document.getElementById('skill-distribution').value;
+    updateTrackers();
+}
+
+function finishGen() {
+    const name = document.getElementById('character-name').value || 'Безіменний Кревний';
+    const clanName = clansData[state.clan]?.name || 'Невідомо';
+    const predatorName = state.selectedPredator ? state.predatorData.find(p => p.id === state.selectedPredator)?.name : 'Не обрано';
+    alert(`Створення завершено!\n\nПерсонаж: ${name}\nКлан: ${clanName}\nХижак: ${predatorName}\n\nТепер ваш персонаж повністю сформований для Світу Темряви!`);
+}
+
+window.addEventListener('DOMContentLoaded', init);
