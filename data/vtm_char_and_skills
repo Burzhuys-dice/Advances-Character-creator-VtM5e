@@ -1,0 +1,56 @@
+[
+  {
+  "attributes": {
+    "physical": [
+      { "id": "strength", "name": "Міць" },
+      { "id": "dexterity", "name": "Спритність" },
+      { "id": "stamina", "name": "Витривалість" }
+    ],
+    "social": [
+      { "id": "charisma", "name": "Харизма" },
+      { "id": "manipulation", "name": "Маніпуляція" },
+      { "id": "composure", "name": "Витримка" }
+    ],
+    "mental": [
+      { "id": "intelligence", "name": "Інтелект" },
+      { "id": "wits", "name": "Кмітливість" },
+      { "id": "resolve", "name": "Рішучість" }
+    ]
+  },
+  "skills": {
+    "physical": [
+      { "id": "athletics", "name": "Атлетика" },
+      { "id": "brawl", "name": "Боротьба" },
+      { "id": "survival", "name": "Виживання" },
+      { "id": "drive", "name": "Керування" },
+      { "id": "larceny", "name": "Крадійство" },
+      { "id": "stealth", "name": "Непомітність" },
+      { "id": "craft", "name": "Ремесло" },
+      { "id": "melee", "name": "Рукопашний бій" },
+      { "id": "firearms", "name": "Стрільба" }
+    ],
+    "social": [
+      { "id": "performance", "name": "Виступ" },
+      { "id": "streetwise", "name": "Вуличний досвід" },
+      { "id": "etiquette", "name": "Етикет" },
+      { "id": "intimidation", "name": "Залякування" },
+      { "id": "leadership", "name": "Лідерство" },
+      { "id": "persuasion", "name": "Переконливість" },
+      { "id": "insight", "name": "Проникливість" },
+      { "id": "animalKen", "name": "Розуміння тварин" },
+      { "id": "subterfuge", "name": "Хитрість" }
+    ],
+    "mental": [
+      { "id": "academics", "name": "Знання" },
+      { "id": "medicine", "name": "Медицина" },
+      { "id": "science", "name": "Наука" },
+      { "id": "occult", "name": "Окультизм" },
+      { "id": "politics", "name": "Політика" },
+      { "id": "investigation", "name": "Розслідування" },
+      { "id": "awareness", "name": "Спостережливість" },
+      { "id": "technology", "name": "Технології" },
+      { "id": "finance", "name": "Фінанси" }
+    ]
+  }
+}
+]
