@@ -25,12 +25,12 @@ async function init() {
 async function fetchAllData() {
     try {
         const [advRes, predRes, coreRes, clansRes, discRes] = await Promise.all([
-            fetch('https://raw.githubusercontent.com/Burzhuys-dice/VtM_character_creation_UA/refs/heads/main/vtm_merits_data.json'),
-            fetch('https://raw.githubusercontent.com/Burzhuys-dice/VtM_character_creation_UA/refs/heads/main/vtm_predator-types_1'),
-            fetch('https://raw.githubusercontent.com/Burzhuys-dice/VtM_character_creation_UA/refs/heads/main/vtm_char_and_skills'),
-            fetch('https://raw.githubusercontent.com/Burzhuys-dice/VtM_character_creation_UA/refs/heads/main/vtm_clans'),
-            fetch('https://raw.githubusercontent.com/Burzhuys-dice/VtM_character_creation_UA/refs/heads/main/vtm_disciplines')
-        ]);
+    fetch('data/vtm_merits_data.json'),
+    fetch('data/vtm_predator-types_1'),
+    fetch('data/vtm_char_and_skills'),
+    fetch('data/vtm_clans'),
+    fetch('data/vtm_disciplines')
+]);
 
         if(advRes.ok) state.advantagesData = await advRes.json();
         renderAvailableAdvantages();
