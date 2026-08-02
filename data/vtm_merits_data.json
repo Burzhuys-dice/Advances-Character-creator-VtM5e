@@ -265,7 +265,7 @@
   },
   {
     "id": 34,
-    "name": "Виключення здобичі (Prey Exclusion)",
+    "name": "Вийняток зі здобичі (Prey Exclusion)",
     "type": "flaw",
     "category": "Харчування",
     "cost": "(•)",
@@ -1273,7 +1273,7 @@
   },
   {
     "id": 160,
-    "name": "Забанений (Banned From)",
+    "name": "Вигнання (Banned From)",
     "type": "flaw",
     "category": "Надбання",
     "cost": "(• - •••)",
@@ -1289,7 +1289,7 @@
   },
   {
     "id": 162,
-    "name": "Недолюблений (Disliked)",
+    "name": "Неприязнь (Disliked)",
     "type": "flaw",
     "category": "Надбання",
     "cost": "(•)",
@@ -1297,7 +1297,7 @@
   },
   {
     "id": 163,
-    "name": "Зневажений (Despised)",
+    "name": "Зневага (Despised)",
     "type": "flaw",
     "category": "Надбання",
     "cost": "(••)",
