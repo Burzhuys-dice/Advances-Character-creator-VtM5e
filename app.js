@@ -548,7 +548,22 @@ function changeClan(clanId) {
     state.clan = clanId;
     document.getElementById('clan-select-1').value = clanId;
     document.getElementById('clan-select-4').value = clanId;
-    document.getElementById('clan-desc-1').innerText = clansData[clanId]?.desc || '';
+    
+    // Отримуємо дані обраного клану
+    const clanInfo = clansData[clanId] || {};
+    document.getElementById('clan-desc-1').innerText = clanInfo.desc || '';
+    
+    // Логіка відображення кланового примусу
+    const compulsionContainer = document.getElementById('clan-compulsion-container');
+    const compulsionText = document.getElementById('clan-compulsion-text');
+    
+    // Якщо поле clan_compultion існує і не має значення "Відсутнє"
+    if (clanInfo.clan_compultion && clanInfo.clan_compultion.trim().toLowerCase() !== "відсутнє") {
+        compulsionText.innerText = clanInfo.clan_compultion;
+        compulsionContainer.classList.remove('hidden');
+    } else {
+        compulsionContainer.classList.add('hidden');
+    }
     
     Object.keys(state.disciplines).forEach(k => state.disciplines[k] = 0);
     state.disciplinePowers = {}; 
