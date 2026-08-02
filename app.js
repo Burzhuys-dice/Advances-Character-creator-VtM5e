@@ -19,6 +19,10 @@ async function init() {
     updateTrackers();
     updateHumanityDisplay();
     
+    // Ініціалізація та відстеження змін для шапки
+    updateHeaderInfo();
+    document.getElementById('character-name').addEventListener('input', updateHeaderInfo);
+    
     document.getElementById('loading-status').innerText = 'Крок за кроком (Дані завантажено)';
 }
 
@@ -584,6 +588,19 @@ function changeClan(clanId) {
 
     renderDisciplines();
     updateTrackers();
+    updateHeaderInfo();
+}
+
+function updateHeaderInfo() {
+    const nameInput = document.getElementById('character-name').value;
+    const displayName = nameInput.trim() !== '' ? nameInput : 'Безіменний';
+    const clanName = clansData[state.clan]?.name || 'Невідомо';
+    
+    const headerName = document.getElementById('header-char-name');
+    const headerClan = document.getElementById('header-char-clan');
+    
+    if (headerName) headerName.innerText = displayName;
+    if (headerClan) headerClan.innerText = clanName;
 }
 
 function populateCustomSpecDropdown() {
