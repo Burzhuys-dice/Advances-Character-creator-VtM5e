@@ -75,7 +75,7 @@ async function fetchAllData() {
                             name: power.ability_name || power.name,
                             level: Number(power.level || 1),
                             desc: power.effect_description || power.desc || '',
-                            requirement: power.requirement || '',
+                            requirement: power.requirement || power.requirements || power.prerequisite || power.prerequisites || '',
                             rouseCost: power.rouse_cost || '',
                             dicePool: power.dice_pool || '',
                             resistance: power.resistance || ''
@@ -308,12 +308,13 @@ function renderDisciplines() {
             let powersList = disciplinesPowersMap[discKey] || [];
 
             for (let dotLevel = 1; dotLevel <= totalDots; dotLevel++) {
-                let availablePowers = powersList.filter(p => Number(p.level) <= dotLevel);
+                let availablePowers = powersList.filter(p => Number(p.level) <= totalDots);
                 
-                let optionsHtml = `<option value="">-- Оберіть здібність (макс. рівень ${dotLevel}) --</option>`;
+                let optionsHtml = `<option value="">-- Оберіть здібність (макс. рівень ${totalDots}) --</option>`;
                 availablePowers.forEach(p => {
                     let isSelected = state.disciplinePowers[discKey][dotLevel] === p.id;
-                    optionsHtml += `<option value="${p.id}" ${isSelected ? 'selected' : ''}>Рівень ${p.level}: ${p.name}</option>`;
+                    let reqText = (p.requirement && String(p.requirement).trim().toLowerCase() !== 'немає' && String(p.requirement).trim() !== '') ? ` [Вимога: ${p.requirement}]` : '';
+                    optionsHtml += `<option value="${p.id}" ${isSelected ? 'selected' : ''}>Рівень ${p.level}: ${p.name}${reqText}</option>`;
                 });
 
                 let selectedDesc = '';
@@ -324,10 +325,10 @@ function renderDisciplines() {
                         selectedDesc = `
                             <div class="mt-2 text-xs text-gray-600 bg-white p-2.5 rounded border border-gray-100 space-y-1">
                                 <p class="italic leading-snug">${foundPower.desc}</p>
-                                ${foundPower.requirement ? `<p><strong>Вимога:</strong> ${foundPower.requirement}</p>` : ''}
-                                ${foundPower.rouseCost ? `<p><strong>Збурення:</strong> ${foundPower.rouseCost}</p>` : ''}
-                                ${foundPower.dicePool ? `<p><strong>Пул кубиків:</strong> ${foundPower.dicePool}</p>` : ''}
-                                ${foundPower.resistance ? `<p><strong>Опір:</strong> ${foundPower.resistance}</p>` : ''}
+                                ${(foundPower.requirement && String(foundPower.requirement).trim().toLowerCase() !== 'немає' && String(foundPower.requirement).trim() !== '') ? `<p><strong>Вимога:</strong> ${foundPower.requirement}</p>` : ''}
+                                ${(foundPower.rouseCost && String(foundPower.rouseCost).trim().toLowerCase() !== 'немає' && String(foundPower.rouseCost).trim() !== '') ? `<p><strong>Збурення:</strong> ${foundPower.rouseCost}</p>` : ''}
+                                ${(foundPower.dicePool && String(foundPower.dicePool).trim().toLowerCase() !== 'немає' && String(foundPower.dicePool).trim() !== '') ? `<p><strong>Пул кубиків:</strong> ${foundPower.dicePool}</p>` : ''}
+                                ${(foundPower.resistance && String(foundPower.resistance).trim().toLowerCase() !== 'немає' && String(foundPower.resistance).trim() !== '') ? `<p><strong>Опір:</strong> ${foundPower.resistance}</p>` : ''}
                             </div>
                         `;
                     }
@@ -616,7 +617,6 @@ function goToStep(step) {
 }
 
 function updateTrackers() {
-    // Дисципліни
     const discCounts = { 2: 0, 1: 0 };
     Object.values(state.disciplines).forEach(val => {
         if (val === 2) discCounts[2]++;
@@ -625,30 +625,24 @@ function updateTrackers() {
     });
     const discTracker = document.getElementById('disc-tracker');
     discTracker.innerHTML = [2, 1].map(val => {
-        const current = discCounts[val];
-        const target = 1;
-        let badgeClass = current === target ? 'valid' : (current > target ? 'exceeded' : 'invalid');
-        return `<div class="px-3 py-1 rounded border tracker-badge ${badgeClass}">
-            ${val} ⬤ : ${current} / ${target}
+        const isValid = discCounts[val] === 1;
+        return `<div class="px-3 py-1 rounded border tracker-badge ${isValid ? 'valid' : 'invalid'}">
+            ${val} ⬤ : ${discCounts[val]} / 1
         </div>`;
     }).join('');
 
-    // Характеристики
     const attrCounts = { 4: 0, 3: 0, 2: 0, 1: 0 };
     Object.values(state.attributes).forEach(val => {
         if (val >= 1 && val <= 4) attrCounts[val]++;
     });
     const attrTracker = document.getElementById('attr-tracker');
     attrTracker.innerHTML = [4, 3, 2].map(val => {
-        const current = attrCounts[val];
-        const target = attrTarget[val];
-        let badgeClass = current === target ? 'valid' : (current > target ? 'exceeded' : 'invalid');
-        return `<div class="px-3 py-1 rounded border tracker-badge ${badgeClass}">
-            ${val} ⬤ : ${current} / ${target}
+        const isValid = attrCounts[val] === attrTarget[val];
+        return `<div class="px-3 py-1 rounded border tracker-badge ${isValid ? 'valid' : 'invalid'}">
+            ${val} ⬤ : ${attrCounts[val]} / ${attrTarget[val]}
         </div>`;
     }).join('');
 
-    // Навички
     const skillCounts = { 4: 0, 3: 0, 2: 0, 1: 0 };
     Object.values(state.skills).forEach(val => {
         if (val >= 1 && val <= 4) skillCounts[val]++;
@@ -657,18 +651,15 @@ function updateTrackers() {
     const skillTracker = document.getElementById('skill-tracker');
     let skillHtml = '';
     [4, 3, 2, 1].forEach(val => {
-        const targetVal = target[val] || 0;
-        const current = skillCounts[val];
-        if (targetVal > 0 || current > 0) {
-            let badgeClass = current === targetVal ? 'valid' : (current > targetVal ? 'exceeded' : 'invalid');
-            skillHtml += `<div class="px-3 py-1 rounded border tracker-badge ${badgeClass}">
-                ${val} ⬤ : ${current} / ${targetVal}
+        if (target[val] > 0 || skillCounts[val] > 0) {
+            const isValid = skillCounts[val] === target[val];
+            skillHtml += `<div class="px-3 py-1 rounded border tracker-badge ${isValid ? 'valid' : 'invalid'}">
+                ${val} ⬤ : ${skillCounts[val]} / ${target[val]}
             </div>`;
         }
     });
     skillTracker.innerHTML = skillHtml;
 
-    // Блага та Вади
     let totalMeritsDots = 0;
     let totalFlawsDots = 0;
     state.selectedAdvantages.forEach(adv => {
@@ -680,9 +671,8 @@ function updateTrackers() {
 
     meritsEl.innerText = `${totalMeritsDots} / 7 ⬤`;
     flawsEl.innerText = `${totalFlawsDots} / 2 ⬤`;
-    
-    meritsEl.className = `px-3 py-1 text-sm font-bold rounded border tracker-badge ${totalMeritsDots === 7 ? 'valid' : (totalMeritsDots > 7 ? 'exceeded' : 'invalid')}`;
-    flawsEl.className = `px-3 py-1 text-sm font-bold rounded border tracker-badge ${totalFlawsDots === 2 ? 'valid' : (totalFlawsDots > 2 ? 'exceeded' : 'invalid')}`;
+    meritsEl.className = `px-3 py-1 text-sm font-bold rounded border tracker-badge ${totalMeritsDots === 7 ? 'valid' : 'invalid'}`;
+    flawsEl.className = `px-3 py-1 text-sm font-bold rounded border tracker-badge ${totalFlawsDots === 2 ? 'valid' : 'invalid'}`;
 }
 
 function changeSkillDistribution() {
@@ -779,7 +769,12 @@ function finishGen() {
                         summaryHTML += `
                             <li class="text-sm border-t border-gray-100 pt-2 print:border-gray-200">
                                 <div class="font-bold text-gray-800 mb-1">Рівень ${i}: ${powerInfo.name}</div>
-                                <p class="text-xs text-gray-600 leading-snug text-justify">${powerInfo.desc}</p>
+                                <p class="text-xs text-gray-600 leading-snug text-justify mb-2">${powerInfo.desc}</p>
+                                <div class="text-[11px] text-gray-500 space-y-0.5">
+                                    ${(powerInfo.requirement && String(powerInfo.requirement).trim().toLowerCase() !== 'немає' && String(powerInfo.requirement).trim() !== '') ? `<p><span class="font-bold text-gray-700">Вимога:</span> ${powerInfo.requirement}</p>` : ''}
+                                    ${(powerInfo.rouseCost && String(powerInfo.rouseCost).trim().toLowerCase() !== 'немає' && String(powerInfo.rouseCost).trim() !== '') ? `<p><span class="font-bold text-gray-700">Збурення:</span> ${powerInfo.rouseCost}</p>` : ''}
+                                    ${(powerInfo.dicePool && String(powerInfo.dicePool).trim().toLowerCase() !== 'немає' && String(powerInfo.dicePool).trim() !== '') ? `<p><span class="font-bold text-gray-700">Пул:</span> ${powerInfo.dicePool}</p>` : ''}
+                                </div>
                             </li>
                         `;
                     }
