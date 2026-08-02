@@ -809,7 +809,6 @@ function finishGen() {
     summaryHTML += `</div></div>`;
 
     document.getElementById('summary-content').innerHTML = summaryHTML;
-    goToStep(7);
 }
 
 function createSummaryDots(count, max = 5) {
