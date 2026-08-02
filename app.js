@@ -324,6 +324,7 @@ function renderDisciplines() {
                         selectedDesc = `
                             <div class="mt-2 text-xs text-gray-600 bg-white p-2.5 rounded border border-gray-100 space-y-1">
                                 <p class="italic leading-snug">${foundPower.desc}</p>
+                                ${foundPower.requirement ? `<p><strong>Вимога:</strong> ${foundPower.requirement}</p>` : ''}
                                 ${foundPower.rouseCost ? `<p><strong>Збурення:</strong> ${foundPower.rouseCost}</p>` : ''}
                                 ${foundPower.dicePool ? `<p><strong>Пул кубиків:</strong> ${foundPower.dicePool}</p>` : ''}
                                 ${foundPower.resistance ? `<p><strong>Опір:</strong> ${foundPower.resistance}</p>` : ''}
