@@ -25,12 +25,12 @@ async function init() {
 async function fetchAllData() {
     try {
         const [advRes, predRes, coreRes, clansRes, discRes] = await Promise.all([
-    fetch('data/vtm_merits_data.json'),
-    fetch('data/vtm_predator-types_1'),
-    fetch('data/vtm_char_and_skills'),
-    fetch('data/vtm_clans'),
-    fetch('data/vtm_disciplines')
-]);
+            fetch('data/vtm_merits_data.json'),
+            fetch('data/vtm_predator-types_1'),
+            fetch('data/vtm_char_and_skills'),
+            fetch('data/vtm_clans'),
+            fetch('data/vtm_disciplines')
+        ]);
 
         if(advRes.ok) state.advantagesData = await advRes.json();
         renderAvailableAdvantages();
@@ -51,7 +51,6 @@ async function fetchAllData() {
         if(clansRes.ok) {
             const cData = await clansRes.json();
             if (Array.isArray(cData)) {
-                // Перетворюємо масив на об'єкт з ключами по id, щоб стара логіка працювала без збоїв
                 clansData = {};
                 cData.forEach(clan => {
                     clansData[clan.id] = clan;
@@ -409,12 +408,10 @@ function renderSkills() {
 function parseDotOptions(costStr) {
     const str = String(costStr).trim();
     
-    // 1. Окремі дискретні опції (через кому або слеш)
     if (str.includes(',') || str.includes('/')) {
         return str.split(/[,/]/).map(part => part.replace(/[^•]/g, '').length).filter(n => n > 0);
     }
     
-    // 2. Неперервний діапазон (дефіс)
     if (str.includes('-')) {
         const parts = str.split('-');
         let min = parts[0].replace(/[^•]/g, '').length;
@@ -424,7 +421,6 @@ function parseDotOptions(costStr) {
         return res;
     } 
     
-    // 3. Від певної кількості крапок і вище (+)
     if (str.includes('+')) {
         let min = str.replace(/[^•]/g, '').length;
         let res = [];
@@ -432,7 +428,6 @@ function parseDotOptions(costStr) {
         return res;
     }
     
-    // 4. Фіксована кількість
     let count = str.replace(/[^•]/g, '').length;
     return [count > 0 ? count : 1];
 }
@@ -557,20 +552,28 @@ function changeClan(clanId) {
     document.getElementById('clan-select-1').value = clanId;
     document.getElementById('clan-select-4').value = clanId;
     
-    // Отримуємо дані обраного клану
     const clanInfo = clansData[clanId] || {};
     document.getElementById('clan-desc-1').innerText = clanInfo.desc || '';
     
-    // Логіка відображення кланового примусу
     const compulsionContainer = document.getElementById('clan-compulsion-container');
     const compulsionText = document.getElementById('clan-compulsion-text');
-    
     if (compulsionContainer && compulsionText) {
         if (clanInfo.clan_compultion && clanInfo.clan_compultion.trim().toLowerCase() !== "відсутнє") {
             compulsionText.innerText = clanInfo.clan_compultion;
             compulsionContainer.classList.remove('hidden');
         } else {
             compulsionContainer.classList.add('hidden');
+        }
+    }
+
+    const baneContainer = document.getElementById('clan-bane-container');
+    const baneText = document.getElementById('clan-bane-text');
+    if (baneContainer && baneText) {
+        if (clanInfo.clan_bane && clanInfo.clan_bane.trim().toLowerCase() !== "відсутнє") {
+            baneText.innerText = clanInfo.clan_bane;
+            baneContainer.classList.remove('hidden');
+        } else {
+            baneContainer.classList.add('hidden');
         }
     }
     
@@ -596,14 +599,16 @@ function goToStep(step) {
     document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
     document.getElementById(`step-${step}`).classList.add('active');
 
-    [1, 2, 3, 4, 5, 6].forEach(i => {
+    [1, 2, 3, 4, 5, 6, 7].forEach(i => {
         const btn = document.getElementById(`nav-step-${i}`);
-        if (i === step) {
-            btn.classList.add('bg-[#8b0000]', 'text-white');
-            btn.classList.remove('text-gray-500', 'hover:bg-gray-100');
-        } else {
-            btn.classList.remove('bg-[#8b0000]', 'text-white');
-            btn.classList.add('text-gray-500', 'hover:bg-gray-100');
+        if(btn) {
+            if (i === step) {
+                btn.classList.add('bg-[#8b0000]', 'text-white');
+                btn.classList.remove('text-gray-500', 'hover:bg-gray-100');
+            } else {
+                btn.classList.remove('bg-[#8b0000]', 'text-white');
+                btn.classList.add('text-gray-500', 'hover:bg-gray-100');
+            }
         }
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -675,9 +680,145 @@ function changeSkillDistribution() {
 
 function finishGen() {
     const name = document.getElementById('character-name').value || 'Безіменний Кревний';
+    const concept = document.getElementById('concept-phrase').value || 'Невідомий концепт';
     const clanName = clansData[state.clan]?.name || 'Невідомо';
     const predatorName = state.selectedPredator ? state.predatorData.find(p => p.id === state.selectedPredator)?.name : 'Не обрано';
-    alert(`Створення завершено!\n\nПерсонаж: ${name}\nКлан: ${clanName}\nХижак: ${predatorName}\n\nТепер ваш персонаж повністю сформований для Світу Темряви!`);
+    
+    let currentHumanity = 7;
+    if (state.selectedPredator) {
+        const predator = state.predatorData.find(p => p.id === state.selectedPredator);
+        if (predator && predator.humanity_modifier) currentHumanity += predator.humanity_modifier;
+    }
+
+    document.getElementById('summary-name').innerText = name;
+    document.getElementById('summary-concept').innerText = `${concept} | ${clanName} | ${predatorName}`;
+    document.getElementById('summary-humanity').innerText = currentHumanity;
+
+    let summaryHTML = '';
+    const cats = [{ key: 'physical', label: 'Фізичні' }, { key: 'social', label: 'Соціальні' }, { key: 'mental', label: 'Ментальні' }];
+
+    // БЛОК 1: ХАРАКТЕРИСТИКИ
+    summaryHTML += `
+        <div>
+            <h3 class="text-xl font-bold text-[#1a1a1a] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">Характеристики</h3>
+            <div class="grid grid-cols-3 gap-6">
+    `;
+    cats.forEach(cat => {
+        summaryHTML += `<div><h4 class="font-bold text-xs text-gray-400 uppercase mb-3">${cat.label}</h4><div class="space-y-2">`;
+        (attributesData[cat.key] || []).forEach(attr => {
+            summaryHTML += `<div class="flex justify-between items-center text-sm border-b border-gray-100 pb-1"><span class="font-serif font-bold text-gray-800">${attr.name}</span> <span>${createSummaryDots(state.attributes[attr.id])}</span></div>`;
+        });
+        summaryHTML += `</div></div>`;
+    });
+    summaryHTML += `</div></div>`;
+
+    // БЛОК 2: НАВИЧКИ
+    summaryHTML += `
+        <div>
+            <h3 class="text-xl font-bold text-[#1a1a1a] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">Навички (Тільки вивчені)</h3>
+            <div class="grid grid-cols-3 gap-6">
+    `;
+    cats.forEach(cat => {
+        summaryHTML += `<div><h4 class="font-bold text-xs text-gray-400 uppercase mb-3">${cat.label}</h4><div class="space-y-2">`;
+        (skillsData[cat.key] || []).forEach(skill => {
+            let totalDots = state.skills[skill.id] + (state.predatorChoices.skill === skill.id ? 1 : 0);
+            if (totalDots > 0) {
+                let specText = (state.predatorChoices.skill === skill.id && state.predatorChoices.specName) ? ` <span class="text-[10px] text-gray-500 font-normal">(${state.predatorChoices.specName})</span>` : '';
+                summaryHTML += `<div class="flex justify-between items-center text-sm border-b border-gray-100 pb-1"><span class="font-serif font-bold text-gray-800">${skill.name}${specText}</span> <span>${createSummaryDots(totalDots)}</span></div>`;
+            }
+        });
+        summaryHTML += `</div></div>`;
+    });
+    summaryHTML += `</div></div>`;
+
+    // БЛОК 3: ДИСЦИПЛІНИ
+    summaryHTML += `
+        <div>
+            <h3 class="text-xl font-bold text-[#1a1a1a] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">Дисципліни та Здібності</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    `;
+    
+    let availableDisc = [...(clansData[state.clan]?.disciplines || [])];
+    if (state.predatorChoices.discipline && !availableDisc.includes(state.predatorChoices.discipline)) {
+        availableDisc.push(state.predatorChoices.discipline);
+    }
+
+    let hasDisciplines = false;
+    availableDisc.forEach(discKey => {
+        let totalDots = (state.disciplines[discKey] || 0) + (state.predatorChoices.discipline === discKey ? 1 : 0);
+        if (totalDots > 0) {
+            hasDisciplines = true;
+            const discName = disciplinesData[discKey]?.name || discKey;
+            
+            summaryHTML += `
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 print:border-gray-300 print:bg-transparent">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-serif font-bold text-lg text-[#8b0000] uppercase tracking-wider">${discName}</span> 
+                        <span>${createSummaryDots(totalDots)}</span>
+                    </div>
+                    <ul class="space-y-2">
+            `;
+
+            for (let i = 1; i <= totalDots; i++) {
+                let powerId = state.disciplinePowers[discKey]?.[i];
+                if (powerId) {
+                    let powerInfo = disciplinesPowersMap[discKey]?.find(p => p.id === powerId);
+                    if (powerInfo) {
+                        summaryHTML += `
+                            <li class="text-sm border-t border-gray-100 pt-2 print:border-gray-200">
+                                <div class="font-bold text-gray-800 mb-1">Рівень ${i}: ${powerInfo.name}</div>
+                                <p class="text-xs text-gray-600 leading-snug text-justify">${powerInfo.desc}</p>
+                            </li>
+                        `;
+                    }
+                }
+            }
+            summaryHTML += `</ul></div>`;
+        }
+    });
+
+    if (!hasDisciplines) {
+        summaryHTML += `<p class="text-sm text-gray-500 italic col-span-full">Персонаж ще не опанував жодних дисциплін.</p>`;
+    }
+    summaryHTML += `</div></div>`;
+
+    // БЛОК 4: БЛАГА ТА ВАДИ
+    summaryHTML += `
+        <div>
+            <h3 class="text-xl font-bold text-[#1a1a1a] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">Блага та Вади</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    `;
+    
+    if (state.selectedAdvantages.length === 0) {
+        summaryHTML += `<p class="text-sm text-gray-500 italic col-span-full">Переваги чи недоліки відсутні.</p>`;
+    } else {
+        state.selectedAdvantages.forEach(adv => {
+            let badgeClass = adv.type === 'flaw' ? 'bg-gray-800 text-white' : 'bg-red-100 text-red-800';
+            let label = adv.type === 'flaw' ? 'Вада' : 'Благо';
+            summaryHTML += `
+                <div class="flex justify-between items-center border-b border-gray-100 pb-2 print:border-gray-200">
+                    <div>
+                        <span class="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${badgeClass} print:border print:border-gray-300 print:bg-transparent print:text-black">${label}</span>
+                        <span class="font-serif font-bold text-gray-800 ml-2">${adv.name}</span>
+                    </div>
+                    <span class="font-bold text-sm text-gray-700">${adv.cost} ⬤</span>
+                </div>
+            `;
+        });
+    }
+    summaryHTML += `</div></div>`;
+
+    document.getElementById('summary-content').innerHTML = summaryHTML;
+    goToStep(7);
+}
+
+function createSummaryDots(count, max = 5) {
+    let html = '<div class="flex gap-1">';
+    for (let i = 1; i <= max; i++) {
+        html += `<div class="w-2.5 h-2.5 rounded-full border border-[#1a1a1a] ${i <= count ? 'bg-[#8b0000] border-[#8b0000]' : 'bg-transparent'}"></div>`;
+    }
+    html += '</div>';
+    return html;
 }
 
 window.addEventListener('DOMContentLoaded', init);
