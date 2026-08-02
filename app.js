@@ -19,7 +19,6 @@ async function init() {
     updateTrackers();
     updateHumanityDisplay();
     
-    // Ініціалізація та відстеження змін для шапки
     updateHeaderInfo();
     document.getElementById('character-name').addEventListener('input', updateHeaderInfo);
     
@@ -615,6 +614,9 @@ function populateCustomSpecDropdown() {
 }
 
 function goToStep(step) {
+    if (step === 7) {
+        finishGen();
+    }
     document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
     document.getElementById(`step-${step}`).classList.add('active');
 
@@ -634,7 +636,6 @@ function goToStep(step) {
 }
 
 function updateTrackers() {
-    // Дисципліни
     const discCounts = { 2: 0, 1: 0 };
     Object.values(state.disciplines).forEach(val => {
         if (val === 2) discCounts[2]++;
@@ -651,7 +652,6 @@ function updateTrackers() {
         </div>`;
     }).join('');
 
-    // Характеристики
     const attrCounts = { 4: 0, 3: 0, 2: 0, 1: 0 };
     Object.values(state.attributes).forEach(val => {
         if (val >= 1 && val <= 4) attrCounts[val]++;
@@ -666,7 +666,6 @@ function updateTrackers() {
         </div>`;
     }).join('');
 
-    // Навички
     const skillCounts = { 4: 0, 3: 0, 2: 0, 1: 0 };
     Object.values(state.skills).forEach(val => {
         if (val >= 1 && val <= 4) skillCounts[val]++;
@@ -686,7 +685,6 @@ function updateTrackers() {
     });
     skillTracker.innerHTML = skillHtml;
 
-    // Блага та Вади
     let totalMeritsDots = 0;
     let totalFlawsDots = 0;
     state.selectedAdvantages.forEach(adv => {
@@ -711,14 +709,18 @@ function changeSkillDistribution() {
 function finishGen() {
     const name = document.getElementById('character-name').value || 'Безіменний Кревний';
     const concept = document.getElementById('concept-phrase').value || 'Невідомий концепт';
-    const clanName = clansData[state.clan]?.name || 'Невідомо';
-    const predatorName = state.selectedPredator ? state.predatorData.find(p => p.id === state.selectedPredator)?.name : 'Не обрано';
+    const backgroundText = document.getElementById('concept-bg').value || 'Історія персонажа відсутня.';
+    const clanInfo = clansData[state.clan] || {};
+    const clanName = clanInfo.name || 'Невідомо';
+    const clanCompulsion = clanInfo.clan_compultion && clanInfo.clan_compultion.trim().toLowerCase() !== "відсутнє" ? clanInfo.clan_compultion : 'Немає';
+    const clanBane = clanInfo.clan_bane && clanInfo.clan_bane.trim().toLowerCase() !== "відсутнє" ? clanInfo.clan_bane : 'Немає';
+    
+    const predator = state.selectedPredator ? state.predatorData.find(p => p.id === state.selectedPredator) : null;
+    const predatorName = predator ? predator.name : 'Не обрано';
+    const predatorDesc = predator ? predator.description : '';
     
     let currentHumanity = 7;
-    if (state.selectedPredator) {
-        const predator = state.predatorData.find(p => p.id === state.selectedPredator);
-        if (predator && predator.humanity_modifier) currentHumanity += predator.humanity_modifier;
-    }
+    if (predator && predator.humanity_modifier) currentHumanity += predator.humanity_modifier;
 
     document.getElementById('summary-name').innerText = name;
     document.getElementById('summary-concept').innerText = `${concept} | ${clanName} | ${predatorName}`;
@@ -727,11 +729,29 @@ function finishGen() {
     let summaryHTML = '';
     const cats = [{ key: 'physical', label: 'Фізичні' }, { key: 'social', label: 'Соціальні' }, { key: 'mental', label: 'Ментальні' }];
 
-    // БЛОК 1: ХАРАКТЕРИСТИКИ
+    // СЕКЦІЯ 1: КОНЦЕПТ ТА КЛАН (Вкладка 1)
     summaryHTML += `
-        <div>
-            <h3 class="text-xl font-bold text-[#1a1a1a] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">Характеристики</h3>
-            <div class="grid grid-cols-3 gap-6">
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
+            <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">1. Концепт та Кров</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                <div>
+                    <p class="mb-2"><strong class="text-gray-700 uppercase text-xs tracking-wider block">Концепт:</strong> <span class="text-gray-900 font-serif text-base">${concept}</span></p>
+                    <p class="mb-2"><strong class="text-gray-700 uppercase text-xs tracking-wider block">Клан:</strong> <span class="text-gray-900 font-serif text-base">${clanName}</span></p>
+                    <p class="mb-2"><strong class="text-gray-700 uppercase text-xs tracking-wider block">Історія / Фон:</strong> <span class="text-gray-700 font-serif italic block mt-1">${backgroundText}</span></p>
+                </div>
+                <div class="space-y-3 bg-white p-4 rounded border border-gray-100 print:border-gray-200">
+                    <div><strong class="text-[#8b0000] uppercase text-[10px] tracking-widest block">Клановий примус:</strong> <p class="text-xs text-gray-800 leading-snug">${clanCompulsion}</p></div>
+                    <div><strong class="text-red-700 uppercase text-[10px] tracking-widest block">Кланове прокляття:</strong> <p class="text-xs text-gray-800 leading-snug">${clanBane}</p></div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // СЕКЦІЯ 2: ХАРАКТЕРИСТИКИ (Вкладка 2)
+    summaryHTML += `
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
+            <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">2. Характеристики</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     `;
     cats.forEach(cat => {
         summaryHTML += `<div><h4 class="font-bold text-xs text-gray-400 uppercase mb-3">${cat.label}</h4><div class="space-y-2">`;
@@ -742,11 +762,18 @@ function finishGen() {
     });
     summaryHTML += `</div></div>`;
 
-    // БЛОК 2: НАВИЧКИ
+    // СЕКЦІЯ 3: НАВИЧКИ ТА СПЕЦІАЛІЗАЦІЇ (Вкладка 3)
+    let specAcademics = document.getElementById('spec-academics')?.value || '';
+    let specCraft = document.getElementById('spec-craft')?.value || '';
+    let specPerformance = document.getElementById('spec-performance')?.value || '';
+    let specScience = document.getElementById('spec-science')?.value || '';
+    let customSpecName = document.getElementById('spec-custom-name')?.value || '';
+    let customSpecSkill = document.getElementById('spec-custom-skill')?.value || '';
+
     summaryHTML += `
-        <div>
-            <h3 class="text-xl font-bold text-[#1a1a1a] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">Навички (Тільки вивчені)</h3>
-            <div class="grid grid-cols-3 gap-6">
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
+            <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">3. Навички та Спеціалізації</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
     `;
     cats.forEach(cat => {
         summaryHTML += `<div><h4 class="font-bold text-xs text-gray-400 uppercase mb-3">${cat.label}</h4><div class="space-y-2">`;
@@ -759,12 +786,24 @@ function finishGen() {
         });
         summaryHTML += `</div></div>`;
     });
-    summaryHTML += `</div></div>`;
+    summaryHTML += `</div>`;
 
-    // БЛОК 3: ДИСЦИПЛІНИ
+    // Виведення спеціалізацій
     summaryHTML += `
-        <div>
-            <h3 class="text-xl font-bold text-[#1a1a1a] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">Дисципліни та Здібності</h3>
+        <div class="border-t border-gray-200 pt-4 text-xs text-gray-700 grid grid-cols-2 md:grid-cols-4 gap-4">
+            ${specAcademics ? `<div><strong>Знання:</strong> ${specAcademics}</div>` : ''}
+            ${specCraft ? `<div><strong>Ремесло:</strong> ${specCraft}</div>` : ''}
+            ${specPerformance ? `<div><strong>Виступ:</strong> ${specPerformance}</div>` : ''}
+            ${specScience ? `<div><strong>Наука:</strong> ${specScience}</div>` : ''}
+            ${customSpecName ? `<div class="col-span-full"><strong>Додаткова спец. (${customSpecSkill}):</strong> ${customSpecName}</div>` : ''}
+            ${state.predatorChoices.specName ? `<div class="col-span-full text-indigo-800"><strong>Спеціалізація хижака:</strong> ${state.predatorChoices.specName}</div>` : ''}
+        </div>
+    </div>`;
+
+    // СЕКЦІЯ 4: ДИСЦИПЛІНИ ТА ЗДІБНОСТІ (Вкладка 4)
+    summaryHTML += `
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
+            <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">4. Дисципліни та Здібності</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     `;
     
@@ -781,7 +820,7 @@ function finishGen() {
             const discName = disciplinesData[discKey]?.name || discKey;
             
             summaryHTML += `
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 print:border-gray-300 print:bg-transparent">
+                <div class="bg-white p-4 rounded-lg border border-gray-200 print:border-gray-300 print:bg-transparent shadow-sm">
                     <div class="flex justify-between items-center mb-3">
                         <span class="font-serif font-bold text-lg text-[#8b0000] uppercase tracking-wider">${discName}</span> 
                         <span>${createSummaryDots(totalDots)}</span>
@@ -817,11 +856,11 @@ function finishGen() {
     }
     summaryHTML += `</div></div>`;
 
-    // БЛОК 4: БЛАГА ТА ВАДИ
+    // СЕКЦІЯ 5: БЛАГА ТА ВАДИ (Вкладка 5)
     summaryHTML += `
-        <div>
-            <h3 class="text-xl font-bold text-[#1a1a1a] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">Блага та Вади</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
+            <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">5. Блага та Вади</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     `;
     
     if (state.selectedAdvantages.length === 0) {
@@ -831,7 +870,7 @@ function finishGen() {
             let badgeClass = adv.type === 'flaw' ? 'bg-gray-800 text-white' : 'bg-red-100 text-red-800';
             let label = adv.type === 'flaw' ? 'Вада' : 'Благо';
             summaryHTML += `
-                <div class="flex justify-between items-center border-b border-gray-100 pb-2 print:border-gray-200">
+                <div class="flex justify-between items-center bg-white p-3 rounded border border-gray-200 print:border-gray-300 print:bg-transparent">
                     <div>
                         <span class="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${badgeClass} print:border print:border-gray-300 print:bg-transparent print:text-black">${label}</span>
                         <span class="font-serif font-bold text-gray-800 ml-2">${adv.name}</span>
@@ -842,6 +881,18 @@ function finishGen() {
         });
     }
     summaryHTML += `</div></div>`;
+
+    // СЕКЦІЯ 6: ХИЖАЦЬКІ ЗВИЧКИ (Вкладка 6)
+    summaryHTML += `
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
+            <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">6. Хижацькі звички</h3>
+            <div class="text-sm space-y-2">
+                <p><strong>Обраний тип хижака:</strong> <span class="font-serif font-bold text-lg text-[#8b0000]">${predatorName}</span></p>
+                ${predatorDesc ? `<p class="text-gray-600 text-xs italic">${predatorDesc}</p>` : ''}
+                ${predator && predator.advantages_text ? `<p class="mt-2 text-xs bg-indigo-50 p-2.5 rounded border border-indigo-100 text-indigo-900"><strong>Бонуси хижака:</strong> ${predator.advantages_text}</p>` : ''}
+            </div>
+        </div>
+    `;
 
     document.getElementById('summary-content').innerHTML = summaryHTML;
 }
