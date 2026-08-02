@@ -75,7 +75,7 @@ async function fetchAllData() {
                             name: power.ability_name || power.name,
                             level: Number(power.level || 1),
                             desc: power.effect_description || power.desc || '',
-                            requirement: power.requirement || 'Немає',
+                            requirement: power.requirement || '',
                             rouseCost: power.rouse_cost || '',
                             dicePool: power.dice_pool || '',
                             resistance: power.resistance || ''
