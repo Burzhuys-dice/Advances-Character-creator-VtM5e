@@ -50,7 +50,15 @@ async function fetchAllData() {
 
         if(clansRes.ok) {
             const cData = await clansRes.json();
-            if(cData && Object.keys(cData).length > 0) clansData = cData;
+            if (Array.isArray(cData)) {
+                // Перетворюємо масив на об'єкт з ключами по id, щоб стара логіка працювала без збоїв
+                clansData = {};
+                cData.forEach(clan => {
+                    clansData[clan.id] = clan;
+                });
+            } else if(cData && Object.keys(cData).length > 0) {
+                clansData = cData;
+            }
         }
 
         if(discRes.ok) {
@@ -557,12 +565,13 @@ function changeClan(clanId) {
     const compulsionContainer = document.getElementById('clan-compulsion-container');
     const compulsionText = document.getElementById('clan-compulsion-text');
     
-    // Якщо поле clan_compultion існує і не має значення "Відсутнє"
-    if (clanInfo.clan_compultion && clanInfo.clan_compultion.trim().toLowerCase() !== "відсутнє") {
-        compulsionText.innerText = clanInfo.clan_compultion;
-        compulsionContainer.classList.remove('hidden');
-    } else {
-        compulsionContainer.classList.add('hidden');
+    if (compulsionContainer && compulsionText) {
+        if (clanInfo.clan_compultion && clanInfo.clan_compultion.trim().toLowerCase() !== "відсутнє") {
+            compulsionText.innerText = clanInfo.clan_compultion;
+            compulsionContainer.classList.remove('hidden');
+        } else {
+            compulsionContainer.classList.add('hidden');
+        }
     }
     
     Object.keys(state.disciplines).forEach(k => state.disciplines[k] = 0);
