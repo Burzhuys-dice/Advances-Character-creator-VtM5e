@@ -9,6 +9,7 @@
 </head>
 <body class="bg-[#fcfcf9] min-h-screen flex flex-col">
 
+    <!-- Header -->
     <header class="bg-[#1a1a1a] text-white py-4 px-6 border-b-4 border-[#8b0000] shadow-lg sticky top-0 z-50">
         <div class="max-w-5xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-4">
@@ -18,6 +19,7 @@
                     <span class="text-[10px] text-gray-400 uppercase tracking-tighter text-red-500" id="loading-status">Крок за кроком (Завантаження даних...)</span>
                 </div>
             </div>
+            <!-- Humanity Tracker -->
             <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center shadow-inner">
                 <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Людяність</span>
                 <span id="humanity-display" class="text-xl font-serif font-bold text-white transition-all duration-300">7</span>
@@ -25,8 +27,10 @@
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="max-w-5xl mx-auto w-full px-4 py-8 flex-grow">
         
+        <!-- Stepper Navigation -->
         <nav class="flex justify-center mb-10 overflow-x-auto pb-2">
             <div class="flex items-center gap-2 md:gap-4 bg-white p-2 rounded-full shadow-sm border border-gray-200 min-w-max">
                 <button onclick="goToStep(1)" id="nav-step-1" class="px-4 py-2 rounded-full text-sm font-bold transition-colors bg-[#8b0000] text-white">1. Концепт</button>
@@ -43,6 +47,7 @@
             </div>
         </nav>
 
+        <!-- STEP 1: CONCEPT -->
         <section id="step-1" class="step-container active bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-200">
             <h2 class="text-3xl font-bold text-[#8b0000] mb-6 vtm-font uppercase">Концепт Персонажа</h2>
             <p class="text-gray-600 mb-8">Хто ви у цьому Світі Темряви? Опишіть вашу ідею та оберіть вашу кров.</p>
@@ -57,16 +62,18 @@
                     <input type="text" id="character-name" placeholder="Ім'я вашого Кревного" class="custom-input text-xl">
                 </div>
                 
+                <!-- Clan Selection -->
                 <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-    <label class="block text-sm font-bold text-gray-700 uppercase tracking-wider mb-2">Клан</label>
-    <select id="clan-select-1" onchange="changeClan(this.value)" class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-xl font-serif outline-none focus:border-[#8b0000]"></select>
-    <p id="clan-desc-1" class="text-sm text-gray-600 mt-4 italic leading-relaxed min-h-[3rem]"></p>
-    
-    <div id="clan-compulsion-container" class="mt-4 p-3 bg-red-50 border-l-4 border-[#8b0000] rounded-r text-sm hidden transition-all duration-300">
-        <span class="font-bold text-[#8b0000] uppercase text-[10px] tracking-widest block mb-1">Клановий примус (Clan Compulsion)</span>
-        <p id="clan-compulsion-text" class="text-gray-800 leading-relaxed text-justify"></p>
-    </div>
-</div>
+                    <label class="block text-sm font-bold text-gray-700 uppercase tracking-wider mb-2">Клан</label>
+                    <select id="clan-select-1" onchange="changeClan(this.value)" class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-xl font-serif outline-none focus:border-[#8b0000]"></select>
+                    <p id="clan-desc-1" class="text-sm text-gray-600 mt-4 italic leading-relaxed min-h-[3rem]"></p>
+                    
+                    <!-- Новий блок для кланового примусу -->
+                    <div id="clan-compulsion-container" class="mt-4 p-3 bg-red-50 border-l-4 border-[#8b0000] rounded-r text-sm hidden transition-all duration-300">
+                        <span class="font-bold text-[#8b0000] uppercase text-[10px] tracking-widest block mb-1">Клановий примус (Clan Compulsion)</span>
+                        <p id="clan-compulsion-text" class="text-gray-800 leading-relaxed text-justify"></p>
+                    </div>
+                </div>
 
                 <div>
                     <label class="block text-sm font-bold text-gray-700 uppercase tracking-wider mb-2">Історія (Фон)</label>
@@ -79,6 +86,7 @@
             </div>
         </section>
 
+        <!-- STEP 2: ATTRIBUTES -->
         <section id="step-2" class="step-container bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-200">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h2 class="text-3xl font-bold text-[#8b0000] vtm-font uppercase">Характеристики</h2>
@@ -95,6 +103,7 @@
             </div>
         </section>
 
+        <!-- STEP 3: SKILLS -->
         <section id="step-3" class="step-container bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-200">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h2 class="text-3xl font-bold text-[#8b0000] vtm-font uppercase">Навички</h2>
@@ -115,6 +124,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-10" id="skills-grid"></div>
 
+            <!-- Specializations -->
             <div class="border-t-2 border-gray-100 pt-8">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 gap-2">
                     <h3 class="text-2xl font-bold text-[#8b0000] vtm-font uppercase">Спеціалізації</h3>
@@ -143,6 +153,7 @@
             </div>
         </section>
 
+        <!-- STEP 4: DISCIPLINES -->
         <section id="step-4" class="step-container bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-200">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h2 class="text-3xl font-bold text-[#8b0000] vtm-font uppercase">Дисципліни</h2>
@@ -167,6 +178,7 @@
             </div>
         </section>
 
+        <!-- STEP 5: MERITS & FLAWS -->
         <section id="step-5" class="step-container bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-200">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h2 class="text-3xl font-bold text-[#8b0000] vtm-font uppercase">Блага та Вади</h2>
@@ -218,6 +230,7 @@
             </div>
         </section>
 
+        <!-- STEP 6: PREDATOR TYPES -->
         <section id="step-6" class="step-container bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-200">
             <h2 class="text-3xl font-bold text-[#8b0000] mb-2 vtm-font uppercase">Хижацькі звички</h2>
             <p class="text-gray-600 mb-8 text-sm">Те, як ви полюєте, формує вашу сутність. Оберіть свій тип хижака. Це додасть вам нову спеціалізацію, крапку дисципліни (відображається <span class="text-[#4b0082] font-bold">пурпурним</span>), вплине на Людяність та може дати додаткові блага/вади.</p>
@@ -238,6 +251,7 @@
         <p class="text-sm">Vampire: The Masquerade 5th Edition — Character Generator</p>
     </footer>
 
+    <!-- Підключення скриптів -->
     <script src="data.js"></script>
     <script src="app.js"></script>
 </body>
