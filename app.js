@@ -615,6 +615,7 @@ function goToStep(step) {
 }
 
 function updateTrackers() {
+    // Дисципліни
     const discCounts = { 2: 0, 1: 0 };
     Object.values(state.disciplines).forEach(val => {
         if (val === 2) discCounts[2]++;
@@ -623,24 +624,30 @@ function updateTrackers() {
     });
     const discTracker = document.getElementById('disc-tracker');
     discTracker.innerHTML = [2, 1].map(val => {
-        const isValid = discCounts[val] === 1;
-        return `<div class="px-3 py-1 rounded border tracker-badge ${isValid ? 'valid' : 'invalid'}">
-            ${val} ⬤ : ${discCounts[val]} / 1
+        const current = discCounts[val];
+        const target = 1;
+        let badgeClass = current === target ? 'valid' : (current > target ? 'exceeded' : 'invalid');
+        return `<div class="px-3 py-1 rounded border tracker-badge ${badgeClass}">
+            ${val} ⬤ : ${current} / ${target}
         </div>`;
     }).join('');
 
+    // Характеристики
     const attrCounts = { 4: 0, 3: 0, 2: 0, 1: 0 };
     Object.values(state.attributes).forEach(val => {
         if (val >= 1 && val <= 4) attrCounts[val]++;
     });
     const attrTracker = document.getElementById('attr-tracker');
     attrTracker.innerHTML = [4, 3, 2].map(val => {
-        const isValid = attrCounts[val] === attrTarget[val];
-        return `<div class="px-3 py-1 rounded border tracker-badge ${isValid ? 'valid' : 'invalid'}">
-            ${val} ⬤ : ${attrCounts[val]} / ${attrTarget[val]}
+        const current = attrCounts[val];
+        const target = attrTarget[val];
+        let badgeClass = current === target ? 'valid' : (current > target ? 'exceeded' : 'invalid');
+        return `<div class="px-3 py-1 rounded border tracker-badge ${badgeClass}">
+            ${val} ⬤ : ${current} / ${target}
         </div>`;
     }).join('');
 
+    // Навички
     const skillCounts = { 4: 0, 3: 0, 2: 0, 1: 0 };
     Object.values(state.skills).forEach(val => {
         if (val >= 1 && val <= 4) skillCounts[val]++;
@@ -649,15 +656,18 @@ function updateTrackers() {
     const skillTracker = document.getElementById('skill-tracker');
     let skillHtml = '';
     [4, 3, 2, 1].forEach(val => {
-        if (target[val] > 0 || skillCounts[val] > 0) {
-            const isValid = skillCounts[val] === target[val];
-            skillHtml += `<div class="px-3 py-1 rounded border tracker-badge ${isValid ? 'valid' : 'invalid'}">
-                ${val} ⬤ : ${skillCounts[val]} / ${target[val]}
+        const targetVal = target[val] || 0;
+        const current = skillCounts[val];
+        if (targetVal > 0 || current > 0) {
+            let badgeClass = current === targetVal ? 'valid' : (current > targetVal ? 'exceeded' : 'invalid');
+            skillHtml += `<div class="px-3 py-1 rounded border tracker-badge ${badgeClass}">
+                ${val} ⬤ : ${current} / ${targetVal}
             </div>`;
         }
     });
     skillTracker.innerHTML = skillHtml;
 
+    // Блага та Вади
     let totalMeritsDots = 0;
     let totalFlawsDots = 0;
     state.selectedAdvantages.forEach(adv => {
@@ -669,8 +679,9 @@ function updateTrackers() {
 
     meritsEl.innerText = `${totalMeritsDots} / 7 ⬤`;
     flawsEl.innerText = `${totalFlawsDots} / 2 ⬤`;
-    meritsEl.className = `px-3 py-1 text-sm font-bold rounded border tracker-badge ${totalMeritsDots === 7 ? 'valid' : 'invalid'}`;
-    flawsEl.className = `px-3 py-1 text-sm font-bold rounded border tracker-badge ${totalFlawsDots === 2 ? 'valid' : 'invalid'}`;
+    
+    meritsEl.className = `px-3 py-1 text-sm font-bold rounded border tracker-badge ${totalMeritsDots === 7 ? 'valid' : (totalMeritsDots > 7 ? 'exceeded' : 'invalid')}`;
+    flawsEl.className = `px-3 py-1 text-sm font-bold rounded border tracker-badge ${totalFlawsDots === 2 ? 'valid' : (totalFlawsDots > 2 ? 'exceeded' : 'invalid')}`;
 }
 
 function changeSkillDistribution() {
