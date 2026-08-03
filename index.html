@@ -254,13 +254,24 @@
 
             <div id="predator-adv-info" class="hidden w-full mb-6 transition-all duration-300"></div>
 
-            <div class="mb-6 flex gap-4">
-                <input type="text" id="adv-search" onkeyup="renderAvailableAdvantages()" placeholder="Пошук за назвою або описом..." class="custom-input flex-grow text-base bg-gray-50 p-2 rounded border border-gray-300">
-                <select id="adv-type-filter" onchange="renderAvailableAdvantages()" class="bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none">
+            <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <input type="text" id="adv-search" onkeyup="renderAvailableAdvantages()" placeholder="Пошук за назвою або описом..." class="custom-input w-full text-base bg-gray-50 p-2 rounded border border-gray-300">
+                <select id="adv-type-filter" onchange="renderAvailableAdvantages()" class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none">
                     <option value="all">Всі типи</option>
                     <option value="merit">Блага (Чесноти)</option>
                     <option value="background">Надбання</option>
                     <option value="flaw">Вади</option>
+                </select>
+                <select id="adv-category-filter" onchange="renderAvailableAdvantages()" class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none">
+                    <option value="all">Всі категорії</option>
+                </select>
+                <select id="adv-dots-filter" onchange="renderAvailableAdvantages()" class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none">
+                    <option value="all">Всі вартості</option>
+                    <option value="1">1 крапка</option>
+                    <option value="2">2 крапки</option>
+                    <option value="3">3 крапки</option>
+                    <option value="4">4 крапки</option>
+                    <option value="5">5 крапок</option>
                 </select>
             </div>
 
