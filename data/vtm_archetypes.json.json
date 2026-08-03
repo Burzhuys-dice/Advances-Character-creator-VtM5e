@@ -1,0 +1,72 @@
+{
+  "attributes": [
+    {
+      "id": "attr_jack_of_all_trades",
+      "name": "Майстер на всі руки (Збалансований)",
+      "desc": "Універсальний набір для виживання в будь-якій ситуації.",
+      "values": {
+        "strength": 2,
+        "dexterity": 3,
+        "stamina": 2,
+        "charisma": 2,
+        "manipulation": 3,
+        "composure": 2,
+        "intelligence": 2,
+        "wits": 3,
+        "resolve": 2
+      }
+    },
+    {
+      "id": "attr_brute",
+      "name": "Вишибала (Фізичний)",
+      "desc": "Рішення проблем силою.",
+      "values": {
+        "strength": 4,
+        "dexterity": 3,
+        "stamina": 3,
+        "charisma": 1,
+        "manipulation": 2,
+        "composure": 2,
+        "intelligence": 2,
+        "wits": 3,
+        "resolve": 2
+      }
+    }
+  ],
+  "skills": [
+    {
+      "id": "skill_detective",
+      "name": "Детектив (Розслідувач)",
+      "desc": "Збирає інформацію та помічає деталі.",
+      "values": {
+        "investigation": 3,
+        "awareness": 3,
+        "insight": 2,
+        "streetwise": 2,
+        "stealth": 2,
+        "firearms": 1,
+        "brawl": 1,
+        "drive": 1,
+        "subterfuge": 1,
+        "persuasion": 1
+      }
+    },
+    {
+      "id": "skill_socialite",
+      "name": "Світський лев (Соціальний)",
+      "desc": "Маніпулятор та майстер переконання.",
+      "values": {
+        "persuasion": 3,
+        "subterfuge": 3,
+        "insight": 2,
+        "etiquette": 2,
+        "leadership": 2,
+        "awareness": 1,
+        "athletics": 1,
+        "performance": 1,
+        "academics": 1,
+        "finance": 1
+      }
+    }
+  ]
+}
