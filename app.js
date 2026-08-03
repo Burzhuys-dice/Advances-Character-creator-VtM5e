@@ -39,7 +39,10 @@ async function fetchAllData() {
             fetch('data/vtm_archetypes.json') // Завантажуємо файл архетипів
         ]);
 
-        if(advRes.ok) state.advantagesData = await advRes.json();
+        if(advRes.ok) {
+            state.advantagesData = await advRes.json();
+            populateAdvantageCategories();
+        }
         renderAvailableAdvantages();
 
         if(predRes.ok) state.predatorData = await predRes.json();
@@ -571,17 +574,41 @@ function parseDotOptions(costStr) {
     return [count > 0 ? count : 1];
 }
 
+function populateAdvantageCategories() {
+    const select = document.getElementById('adv-category-filter');
+    if (!select || !state.advantagesData) return;
+    
+    // Дістаємо всі унікальні категорії і сортуємо за алфавітом
+    const categories = [...new Set(state.advantagesData.map(item => item.category).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    
+    let html = '<option value="all">Всі категорії</option>';
+    categories.forEach(cat => {
+        html += `<option value="${cat}">${cat}</option>`;
+    });
+    select.innerHTML = html;
+}
+
 function renderAvailableAdvantages() {
     const container = document.getElementById('available-advantages');
     if (state.advantagesData.length === 0) return;
 
     const searchQuery = document.getElementById('adv-search').value.toLowerCase();
     const filterType = document.getElementById('adv-type-filter').value;
+    const filterCat = document.getElementById('adv-category-filter')?.value || 'all';
+    const filterDots = document.getElementById('adv-dots-filter')?.value || 'all';
 
     const filtered = state.advantagesData.filter(item => {
         const matchesSearch = item.name.toLowerCase().includes(searchQuery) || item.desc.toLowerCase().includes(searchQuery);
         const matchesType = filterType === 'all' || item.type === filterType;
-        return matchesSearch && matchesType;
+        const matchesCat = filterCat === 'all' || item.category === filterCat;
+        
+        let matchesDots = true;
+        if (filterDots !== 'all') {
+            const options = parseDotOptions(item.cost);
+            matchesDots = options.includes(parseInt(filterDots));
+        }
+
+        return matchesSearch && matchesType && matchesCat && matchesDots;
     });
 
     if (filtered.length === 0) {
