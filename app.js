@@ -898,6 +898,11 @@ function finishGen() {
     if (state.predatorChoices.discipline && !availableDisc.includes(state.predatorChoices.discipline)) {
         availableDisc.push(state.predatorChoices.discipline);
     }
+    if (state.manualDisciplines) {
+        state.manualDisciplines.forEach(d => {
+            if (!availableDisc.includes(d)) availableDisc.push(d);
+        });
+    }
 
     let hasDisciplines = false;
     availableDisc.forEach(discKey => {
