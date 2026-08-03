@@ -267,6 +267,20 @@ function renderPredatorTypes() {
         const modifierSymbol = (predator.humanity_modifier > 0) ? '+' : '';
         const modifierText = predator.humanity_modifier !== 0 ? `Людяність ${modifierSymbol}${predator.humanity_modifier}` : 'Людяність незмінна';
 
+        let advantagesDisplay = '';
+        if (predator.advantages_text || predator.advantages_text_full) {
+            advantagesDisplay = `<div class="bg-purple-50 p-2 rounded text-indigo-800 border border-purple-100 flex flex-col gap-1">`;
+            if (predator.advantages_text) {
+                advantagesDisplay += `<span class="text-[11px] font-bold">${predator.advantages_text}</span>`;
+            }
+            if (predator.advantages_text_full) {
+                advantagesDisplay += `<span class="text-[10px] leading-snug opacity-90">${predator.advantages_text_full}</span>`;
+            }
+            advantagesDisplay += `</div>`;
+        } else {
+            advantagesDisplay = `<div class="bg-purple-50 p-2 rounded text-[11px] font-bold text-indigo-800 border border-purple-100">Немає додаткових благ/вад</div>`;
+        }
+
         html += `
             <div class="predator-card flex flex-col bg-white p-5 rounded-xl shadow-sm cursor-pointer ${isSelected ? 'selected' : 'border-gray-200 hover:border-gray-300'}" 
                  onclick="selectPredator('${predator.id}')">
@@ -275,7 +289,7 @@ function renderPredatorTypes() {
                     <span class="text-[10px] font-bold px-2 py-1 rounded bg-gray-100 text-gray-700 min-w-max text-right">${modifierText}</span>
                 </div>
                 <p class="text-xs text-gray-600 mb-3 flex-grow text-justify">${predator.description}</p>
-                <div class="bg-purple-50 p-2 rounded text-[11px] font-bold text-indigo-800 border border-purple-100">${predator.advantages_text || 'Немає додаткових благ/вад'}</div>
+                ${advantagesDisplay}
                 ${optionsHtml}
             </div>
         `;
