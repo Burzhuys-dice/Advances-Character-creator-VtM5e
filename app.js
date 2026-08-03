@@ -1,8 +1,10 @@
 async function init() {
     state.archetypesData = { attributes: [], skills: [] }; // Ініціалізація стану архетипів
+    state.manualDisciplines = []; // Ініціалізація ручних дисциплін
     await fetchAllData();
     
-    Object.keys(disciplinesData).forEach(d => {
+    let discKeys = Array.isArray(disciplinesData) ? disciplinesData.map(d => d.id) : Object.keys(disciplinesData);
+    discKeys.forEach(d => {
         if(state.disciplines[d] === undefined) state.disciplines[d] = 0;
     });
     Object.values(attributesData).flat().forEach(a => {
@@ -68,7 +70,8 @@ async function fetchAllData() {
         if(discRes.ok) {
             const dJson = await discRes.json();
             
-            Object.keys(disciplinesData).forEach(k => disciplinesPowersMap[k] = []);
+            let discKeys = Array.isArray(disciplinesData) ? disciplinesData.map(d => d.id) : Object.keys(disciplinesData);
+            discKeys.forEach(k => disciplinesPowersMap[k] = []);
 
             let rawPowers = dJson.powers || (Array.isArray(dJson) ? dJson : []);
             if (Array.isArray(rawPowers)) {
@@ -95,6 +98,7 @@ async function fetchAllData() {
             state.archetypesData = await archRes.json();
         }
         populateArchetypes();
+        populateManualDisciplineDropdown();
 
     } catch (error) {
         console.error('Помилка завантаження даних:', error);
@@ -164,6 +168,55 @@ function applySkillArchetype(archId) {
     
     renderSkills();
     updateTrackers();
+}
+
+function populateManualDisciplineDropdown() {
+    const select = document.getElementById('manual-disc-select');
+    if (!select) return;
+    select.innerHTML = '<option value="">-- Оберіть дисципліну --</option>';
+    
+    let options = [];
+    if (Array.isArray(disciplinesData)) {
+        options = disciplinesData.map(d => ({ id: d.id, name: d.name || d.id }));
+    } else {
+        options = Object.keys(disciplinesData).map(k => ({ id: k, name: disciplinesData[k].name || k }));
+    }
+
+    options.sort((a, b) => a.name.localeCompare(b.name));
+
+    options.forEach(opt => {
+        if(opt.id) select.innerHTML += `<option value="${opt.id}">${opt.name}</option>`;
+    });
+}
+
+function addManualDisciplineFromSelect() {
+    const select = document.getElementById('manual-disc-select');
+    const discId = select.value;
+    if (!discId) return;
+
+    if (!state.manualDisciplines) state.manualDisciplines = [];
+    
+    let availableDisc = [...(clansData[state.clan]?.disciplines || [])];
+    if (state.predatorChoices && state.predatorChoices.discipline) {
+        availableDisc.push(state.predatorChoices.discipline);
+    }
+
+    if (!availableDisc.includes(discId) && !state.manualDisciplines.includes(discId)) {
+        state.manualDisciplines.push(discId);
+        if (state.disciplines[discId] === undefined) {
+            state.disciplines[discId] = 0;
+        }
+        renderDisciplines();
+    }
+    
+    select.value = ""; 
+}
+
+function getDisciplineInfo(discKey) {
+    if (Array.isArray(disciplinesData)) {
+        return disciplinesData.find(d => d.id === discKey) || { name: discKey, desc: 'Опис відсутній' };
+    }
+    return disciplinesData[discKey] || { name: discKey, desc: 'Опис відсутній' };
 }
 
 function renderPredatorTypes() {
@@ -355,6 +408,12 @@ function renderDisciplines() {
         availableDisc.push(state.predatorChoices.discipline);
     }
     
+    if (state.manualDisciplines) {
+        state.manualDisciplines.forEach(d => {
+            if (!availableDisc.includes(d)) availableDisc.push(d);
+        });
+    }
+    
     let html = '<div class="space-y-6 bg-white p-6 border border-gray-200 rounded-lg">';
     
     if(availableDisc.length === 0) {
@@ -362,7 +421,7 @@ function renderDisciplines() {
     }
 
     availableDisc.forEach(discKey => {
-        const discInfo = disciplinesData[discKey] || { name: discKey, desc: 'Опис відсутній' };
+        const discInfo = getDisciplineInfo(discKey);
         const ukrName = discInfo.name || discKey; 
         let bonus = (state.predatorChoices.discipline === discKey) ? 1 : 0;
         let baseDots = state.disciplines[discKey] || 0;
@@ -659,6 +718,7 @@ function changeClan(clanId) {
     
     Object.keys(state.disciplines).forEach(k => state.disciplines[k] = 0);
     state.disciplinePowers = {}; 
+    state.manualDisciplines = []; // Скидаємо вручну додані дисципліни при зміні клану
 
     renderDisciplines();
     updateTrackers();
@@ -909,7 +969,8 @@ function finishGen() {
         let totalDots = (state.disciplines[discKey] || 0) + (state.predatorChoices.discipline === discKey ? 1 : 0);
         if (totalDots > 0) {
             hasDisciplines = true;
-            const discName = disciplinesData[discKey]?.name || discKey;
+            const discInfo = getDisciplineInfo(discKey);
+            const discName = discInfo.name || discKey;
             
             summaryHTML += `
                 <div class="bg-white p-4 rounded-lg border border-gray-200 print:border-gray-300 print:bg-transparent shadow-sm">
