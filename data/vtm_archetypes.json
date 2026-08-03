@@ -228,6 +228,116 @@
       "craft": 2,
       "persuasion": 2
     }
+  },
+      {
+    "id": "skill_police",
+    "name": "Правоохоронець (Police Officer)",
+    "desc": "Служитель закону, навчений реагувати на небезпеку та розуміти кримінальну психологію.",
+    "values": {
+      "firearms": 3,
+      "streetwise": 3,
+      "awareness": 2,
+      "insight": 2
+    }
+  },
+  {
+    "id": "skill_physician",
+    "name": "Лікар (Physician)",
+    "desc": "Експерт із людської анатомії, здатний рятувати життя або професійно приховувати причини смерті.",
+    "values": {
+      "medicine": 3,
+      "academics": 3,
+      "insight": 2,
+      "science": 2
+    }
+  },
+  {
+    "id": "skill_politician",
+    "name": "Політик (Politician)",
+    "desc": "Майстер маніпуляцій державними структурами та ораторського мистецтва.",
+    "values": {
+      "politics": 3,
+      "persuasion": 3,
+      "leadership": 2,
+      "etiquette": 2
+    }
+  },
+  {
+    "id": "skill_burglar",
+    "name": "Зломщик (Burglar)",
+    "desc": "Фахівець із проникнення в захищені приміщення та обходу механічних систем безпеки.",
+    "values": {
+      "larceny": 3,
+      "stealth": 3,
+      "technology": 2,
+      "streetwise": 2
+    }
+  },
+  {
+    "id": "skill_occultist",
+    "name": "Окультист (Occultist)",
+    "desc": "Дослідник потаємного, що присвятив життя пошуку заборонених знань та містичних знаків.",
+    "values": {
+      "occult": 3,
+      "investigation": 3,
+      "academics": 2,
+      "awareness": 2
+    }
+  },
+  {
+    "id": "skill_driver",
+    "name": "Водій (Professional Driver)",
+    "desc": "Професійний перевізник, здатний відірватися від будь-якої погоні в міських джунглях.",
+    "values": {
+      "drive": 3,
+      "streetwise": 3,
+      "technology": 2,
+      "firearms": 2
+    }
+  },
+  {
+    "id": "skill_laborer",
+    "name": "Робітник (Blue-collar Worker)",
+    "desc": "Людина фізичної праці, що звикла покладатися на власну міць та вміння працювати інструментами.",
+    "values": {
+      "craft": 3,
+      "athletics": 3,
+      "brawl": 2,
+      "survival": 2
+    }
+  },
+  {
+    "id": "skill_clergyman",
+    "name": "Священнослужитель (Clergy)",
+    "desc": "Духовний наставник, чия зброя — глибока емпатія та вміння вести за собою паству.",
+    "values": {
+      "academics": 3,
+      "insight": 3,
+      "leadership": 2,
+      "performance": 2
+    }
+  },
+  {
+    "id": "skill_athlete",
+    "name": "Професійний атлет (Athlete)",
+    "desc": "Людина з винятковою фізичною підготовкою, звикла працювати на межі людських можливостей.",
+    "values": {
+      "athletics": 3,
+      "brawl": 3,
+      "performance": 2,
+      "awareness": 2
+    }
+  },
+  {
+    "id": "skill_journalist",
+    "name": "Журналіст (Journalist)",
+    "desc": "Нишпорка, що спеціалізується на видобуванні правди з людей та закритих архівів.",
+    "values": {
+      "investigation": 3,
+      "subterfuge": 3,
+      "technology": 2,
+      "insight": 2
+    }
   }
   ]
 }
