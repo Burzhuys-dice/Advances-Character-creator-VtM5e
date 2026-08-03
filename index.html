@@ -218,6 +218,16 @@
 
             <div id="disciplines-grid" class="max-w-3xl mx-auto shadow-sm"></div>
 
+            <div class="max-w-3xl mx-auto mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Додати дисципліну вручну:</label>
+                <div class="flex gap-2">
+                    <select id="manual-disc-select" class="flex-grow bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-[#8b0000]">
+                        <option value="">-- Оберіть дисципліну --</option>
+                    </select>
+                    <button onclick="addManualDisciplineFromSelect()" class="px-6 py-2 bg-[#1a1a1a] text-white text-sm font-bold uppercase tracking-widest rounded hover:bg-[#8b0000] transition-colors shadow">Додати</button>
+                </div>
+            </div>
+
             <div class="mt-10 flex justify-between">
                 <button onclick="goToStep(4)" class="px-6 py-2 bg-gray-200 text-gray-700 font-bold uppercase tracking-widest text-sm hover:bg-gray-300 transition-colors rounded">⬅ Назад</button>
                 <button onclick="goToStep(6)" class="px-6 py-2 bg-[#1a1a1a] text-white font-bold uppercase tracking-widest text-sm hover:bg-[#8b0000] transition-colors rounded shadow">Далі ➔</button>
