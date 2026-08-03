@@ -1,4 +1,5 @@
 async function init() {
+    state.archetypesData = { attributes: [], skills: [] }; // Ініціалізація стану архетипів
     await fetchAllData();
     
     Object.keys(disciplinesData).forEach(d => {
@@ -27,12 +28,13 @@ async function init() {
 
 async function fetchAllData() {
     try {
-        const [advRes, predRes, coreRes, clansRes, discRes] = await Promise.all([
+        const [advRes, predRes, coreRes, clansRes, discRes, archRes] = await Promise.all([
             fetch('data/vtm_merits_data.json'),
             fetch('data/vtm_predator-types_1'),
             fetch('data/vtm_char_and_skills'),
             fetch('data/vtm_clans'),
-            fetch('data/vtm_disciplines')
+            fetch('data/vtm_disciplines'),
+            fetch('data/vtm_archetypes.json') // Завантажуємо файл архетипів
         ]);
 
         if(advRes.ok) state.advantagesData = await advRes.json();
@@ -87,10 +89,81 @@ async function fetchAllData() {
                 });
             }
         }
+
+        // Обробка архетипів
+        if(archRes && archRes.ok) {
+            state.archetypesData = await archRes.json();
+        }
+        populateArchetypes();
+
     } catch (error) {
         console.error('Помилка завантаження даних:', error);
         document.getElementById('loading-status').innerText = 'Помилка завантаження даних';
     }
+}
+
+// Заповнення випадаючих списків архетипів
+function populateArchetypes() {
+    const attrSelect = document.getElementById('attr-archetype-select');
+    const skillSelect = document.getElementById('skill-archetype-select');
+
+    if (attrSelect && state.archetypesData.attributes) {
+        let html = '<option value="">-- Вручну / Оберіть шаблон --</option>';
+        state.archetypesData.attributes.forEach(a => {
+            html += `<option value="${a.id}">${a.name}</option>`;
+        });
+        attrSelect.innerHTML = html;
+    }
+
+    if (skillSelect && state.archetypesData.skills) {
+        let html = '<option value="">-- Вручну / Оберіть шаблон --</option>';
+        state.archetypesData.skills.forEach(s => {
+            html += `<option value="${s.id}">${s.name}</option>`;
+        });
+        skillSelect.innerHTML = html;
+    }
+}
+
+// Застосування архетипу до характеристик
+function applyAttributeArchetype(archId) {
+    if (!archId) return; // Якщо обрано "Вручну", не змінюємо поточні дані
+    
+    const archetype = state.archetypesData.attributes.find(a => a.id === archId);
+    if (!archetype) return;
+
+    // Скидаємо всі характеристики до базового рівня (1)
+    Object.keys(state.attributes).forEach(k => state.attributes[k] = 1);
+
+    // Застосовуємо значення з архетипу
+    for (const [key, val] of Object.entries(archetype.values)) {
+        if (state.attributes[key] !== undefined) {
+            state.attributes[key] = val;
+        }
+    }
+    
+    renderAttributes();
+    updateTrackers();
+}
+
+// Застосування архетипу до навичок
+function applySkillArchetype(archId) {
+    if (!archId) return; // Якщо обрано "Вручну", не змінюємо поточні дані
+    
+    const archetype = state.archetypesData.skills.find(s => s.id === archId);
+    if (!archetype) return;
+
+    // Скидаємо всі навички до базового рівня (0)
+    Object.keys(state.skills).forEach(k => state.skills[k] = 0);
+
+    // Застосовуємо значення з архетипу
+    for (const [key, val] of Object.entries(archetype.values)) {
+        if (state.skills[key] !== undefined) {
+            state.skills[key] = val;
+        }
+    }
+    
+    renderSkills();
+    updateTrackers();
 }
 
 function renderPredatorTypes() {
@@ -262,9 +335,11 @@ function handleDotClick(type, id, clickedIndex, baseValue, min) {
     if (type === 'attribute') {
         state.attributes[id] = newValue;
         renderAttributes();
+        document.getElementById('attr-archetype-select').value = ""; // Скидаємо селект при ручній зміні
     } else if (type === 'skill') {
         state.skills[id] = newValue;
         renderSkills();
+        document.getElementById('skill-archetype-select').value = ""; // Скидаємо селект при ручній зміні
     } else if (type === 'discipline') {
         state.disciplines[id] = newValue;
         renderDisciplines();
@@ -800,10 +875,22 @@ function finishGen() {
         </div>
     </div>`;
 
-    // СЕКЦІЯ 4: ДИСЦИПЛІНИ ТА ЗДІБНОСТІ (Вкладка 4)
+    // СЕКЦІЯ 4: ХИЖАЦЬКІ ЗВИЧКИ (Вкладка 4)
     summaryHTML += `
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
-            <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">4. Дисципліни та Здібності</h3>
+            <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">4. Хижацькі звички</h3>
+            <div class="text-sm space-y-2">
+                <p><strong>Обраний тип хижака:</strong> <span class="font-serif font-bold text-lg text-[#8b0000]">${predatorName}</span></p>
+                ${predatorDesc ? `<p class="text-gray-600 text-xs italic">${predatorDesc}</p>` : ''}
+                ${predator && predator.advantages_text ? `<p class="mt-2 text-xs bg-indigo-50 p-2.5 rounded border border-indigo-100 text-indigo-900"><strong>Бонуси хижака:</strong> ${predator.advantages_text}</p>` : ''}
+            </div>
+        </div>
+    `;
+
+    // СЕКЦІЯ 5: ДИСЦИПЛІНИ ТА ЗДІБНОСТІ (Вкладка 5)
+    summaryHTML += `
+        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
+            <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">5. Дисципліни та Здібності</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     `;
     
@@ -856,10 +943,10 @@ function finishGen() {
     }
     summaryHTML += `</div></div>`;
 
-    // СЕКЦІЯ 5: БЛАГА ТА ВАДИ (Вкладка 5)
+    // СЕКЦІЯ 6: БЛАГА ТА ВАДИ (Вкладка 6)
     summaryHTML += `
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
-            <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">5. Блага та Вади</h3>
+            <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">6. Блага та Вади</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     `;
     
@@ -881,18 +968,6 @@ function finishGen() {
         });
     }
     summaryHTML += `</div></div>`;
-
-    // СЕКЦІЯ 6: ХИЖАЦЬКІ ЗВИЧКИ (Вкладка 6)
-    summaryHTML += `
-        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
-            <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">6. Хижацькі звички</h3>
-            <div class="text-sm space-y-2">
-                <p><strong>Обраний тип хижака:</strong> <span class="font-serif font-bold text-lg text-[#8b0000]">${predatorName}</span></p>
-                ${predatorDesc ? `<p class="text-gray-600 text-xs italic">${predatorDesc}</p>` : ''}
-                ${predator && predator.advantages_text ? `<p class="mt-2 text-xs bg-indigo-50 p-2.5 rounded border border-indigo-100 text-indigo-900"><strong>Бонуси хижака:</strong> ${predator.advantages_text}</p>` : ''}
-            </div>
-        </div>
-    `;
 
     document.getElementById('summary-content').innerHTML = summaryHTML;
 }
