@@ -37,7 +37,7 @@
     <!-- Main Content -->
     <main class="max-w-5xl mx-auto w-full px-4 py-8 flex-grow print:py-0 print:px-0">
         
-        <!-- Stepper Navigation (Змінено місцями кроки 4 та 6) -->
+        <!-- Stepper Navigation -->
         <nav class="flex justify-center mb-10 overflow-x-auto pb-2 print:hidden">
             <div class="flex items-center gap-1 md:gap-2 bg-white p-2 rounded-full shadow-sm border border-gray-200 min-w-max">
                 <button onclick="goToStep(1)" id="nav-step-1" class="px-3 py-1.5 rounded-full text-xs md:text-sm font-bold transition-colors bg-[#8b0000] text-white">1. Концепт</button>
@@ -109,8 +109,18 @@
                     <div class="flex gap-2 text-sm font-bold" id="attr-tracker"></div>
                 </div>
             </div>
-            <p class="text-gray-600 mb-8 text-sm">Розподіліть крапки між 9 характеристиками. <br><span class="font-bold">Правило:</span> Одна характеристика на 4, три на 3, чотири на 2, і одна залишається на 1 (мінімальне значення для всіх).</p>
+            <p class="text-gray-600 mb-4 text-sm">Розподіліть крапки між 9 характеристиками. <br><span class="font-bold">Правило:</span> Одна характеристика на 4, три на 3, чотири на 2, і одна залишається на 1 (мінімальне значення для всіх).</p>
+            
+            <!-- Блок вибору архетипу характеристик -->
+            <div class="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-red-50 p-4 rounded-lg border border-red-100">
+                <label class="text-sm font-bold text-red-900 uppercase tracking-wider min-w-max">Шаблон характеристик:</label>
+                <select id="attr-archetype-select" onchange="applyAttributeArchetype(this.value)" class="w-full sm:w-auto flex-grow bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-[#8b0000]">
+                    <option value="">-- Вручну / Оберіть шаблон --</option>
+                </select>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12" id="attributes-grid"></div>
+            
             <div class="mt-10 flex justify-between">
                 <button onclick="goToStep(1)" class="px-6 py-2 bg-gray-200 text-gray-700 font-bold uppercase tracking-widest text-sm hover:bg-gray-300 transition-colors rounded">⬅ Назад</button>
                 <button onclick="goToStep(3)" class="px-6 py-2 bg-[#1a1a1a] text-white font-bold uppercase tracking-widest text-sm hover:bg-[#8b0000] transition-colors rounded shadow">Далі ➔</button>
@@ -131,9 +141,17 @@
                 </div>
             </div>
 
-            <div class="bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 shadow-inner mb-8">
+            <div class="bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 shadow-inner mb-6">
                 <div class="text-[10px] font-bold uppercase text-gray-500 mb-2 tracking-widest">Базовий розподіл (Бонуси хижака не враховуються тут):</div>
                 <div class="flex flex-wrap gap-2 text-sm font-bold" id="skill-tracker"></div>
+            </div>
+
+            <!-- Блок вибору архетипу навичок -->
+            <div class="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-red-50 p-4 rounded-lg border border-red-100">
+                <label class="text-sm font-bold text-red-900 uppercase tracking-wider min-w-max">Шаблон навичок:</label>
+                <select id="skill-archetype-select" onchange="applySkillArchetype(this.value)" class="w-full sm:w-auto flex-grow bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-[#8b0000]">
+                    <option value="">-- Вручну / Оберіть шаблон --</option>
+                </select>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-10" id="skills-grid"></div>
@@ -166,7 +184,7 @@
             </div>
         </section>
 
-        <!-- STEP 4: PREDATOR TYPES (Колишній крок 6) -->
+        <!-- STEP 4: PREDATOR TYPES -->
         <section id="step-4" class="step-container bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-200">
             <h2 class="text-3xl font-bold text-[#8b0000] mb-2 vtm-font uppercase">Хижацькі звички</h2>
             <p class="text-gray-600 mb-8 text-sm">Те, як ви полюєте, формує вашу сутність. Оберіть свій тип хижака. Це додасть вам нову спеціалізацію, крапку дисципліни (відображається <span class="text-[#4b0082] font-bold">пурпурним</span>), вплине на Людяність та може дати додаткові блага/вади.</p>
@@ -181,7 +199,7 @@
             </div>
         </section>
 
-        <!-- STEP 5: DISCIPLINES (Колишній крок 4) -->
+        <!-- STEP 5: DISCIPLINES -->
         <section id="step-5" class="step-container bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-200">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h2 class="text-3xl font-bold text-[#8b0000] vtm-font uppercase">Дисципліни</h2>
@@ -206,7 +224,7 @@
             </div>
         </section>
 
-        <!-- STEP 6: MERITS & FLAWS (Колишній крок 5) -->
+        <!-- STEP 6: MERITS & FLAWS -->
         <section id="step-6" class="step-container bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-200">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h2 class="text-3xl font-bold text-[#8b0000] vtm-font uppercase">Блага та Вади</h2>
