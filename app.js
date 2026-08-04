@@ -1,6 +1,8 @@
 async function init() {
-    state.archetypesData = { attributes: [], skills: [] }; // Ініціалізація стану архетипів
-    state.manualDisciplines = []; // Ініціалізація ручних дисциплін
+    state.archetypesData = { attributes: [], skills: [] }; 
+    state.manualDisciplines = []; 
+    state.skillSpecs = state.skillSpecs || {}; // Ініціалізація збереження спеціалізацій
+    
     await fetchAllData();
     
     let discKeys = Array.isArray(disciplinesData) ? disciplinesData.map(d => d.id) : Object.keys(disciplinesData);
@@ -18,7 +20,6 @@ async function init() {
     changeClan(Object.keys(clansData)[0] || 'unknown'); 
     renderAttributes();
     renderSkills();
-    populateCustomSpecDropdown();
     updateTrackers();
     updateHumanityDisplay();
     
@@ -36,7 +37,7 @@ async function fetchAllData() {
             fetch('data.js'),
             fetch('data/vtm_clans'),
             fetch('data/vtm_disciplines'),
-            fetch('data/vtm_archetypes.json') // Завантажуємо файл архетипів
+            fetch('data/vtm_archetypes.json') 
         ]);
 
         if(advRes.ok) {
@@ -50,7 +51,20 @@ async function fetchAllData() {
 
         if(coreRes.ok) {
             const coreData = await coreRes.json();
-            if(coreData.attributes) attributesData = coreData.attributes;
+            if(coreData.attributes) {
+                // Зберігаємо desc з data.js перед оновленням attributesData
+                Object.keys(coreData.attributes).forEach(cat => {
+                    if (attributesData && attributesData[cat]) {
+                        coreData.attributes[cat].forEach(fetchedAttr => {
+                            const localAttr = attributesData[cat].find(a => a.id === fetchedAttr.id);
+                            if (localAttr && localAttr.desc && !fetchedAttr.desc) {
+                                fetchedAttr.desc = localAttr.desc;
+                            }
+                        });
+                    }
+                });
+                attributesData = coreData.attributes;
+            }
             if(coreData.skills) {
                 if(coreData.skills.physical) skillsData.physical = coreData.skills.physical;
                 if(coreData.skills.social) skillsData.social = coreData.skills.social;
@@ -96,7 +110,6 @@ async function fetchAllData() {
             }
         }
 
-        // Обробка архетипів
         if(archRes && archRes.ok) {
             state.archetypesData = await archRes.json();
         }
@@ -109,7 +122,6 @@ async function fetchAllData() {
     }
 }
 
-// Заповнення випадаючих списків архетипів
 function populateArchetypes() {
     const attrSelect = document.getElementById('attr-archetype-select');
     const skillSelect = document.getElementById('skill-archetype-select');
@@ -131,17 +143,14 @@ function populateArchetypes() {
     }
 }
 
-// Застосування архетипу до характеристик
 function applyAttributeArchetype(archId) {
-    if (!archId) return; // Якщо обрано "Вручну", не змінюємо поточні дані
+    if (!archId) return; 
     
     const archetype = state.archetypesData.attributes.find(a => a.id === archId);
     if (!archetype) return;
 
-    // Скидаємо всі характеристики до базового рівня (1)
     Object.keys(state.attributes).forEach(k => state.attributes[k] = 1);
 
-    // Застосовуємо значення з архетипу
     for (const [key, val] of Object.entries(archetype.values)) {
         if (state.attributes[key] !== undefined) {
             state.attributes[key] = val;
@@ -152,17 +161,14 @@ function applyAttributeArchetype(archId) {
     updateTrackers();
 }
 
-// Застосування архетипу до навичок
 function applySkillArchetype(archId) {
-    if (!archId) return; // Якщо обрано "Вручну", не змінюємо поточні дані
+    if (!archId) return; 
     
     const archetype = state.archetypesData.skills.find(s => s.id === archId);
     if (!archetype) return;
 
-    // Скидаємо всі навички до базового рівня (0)
     Object.keys(state.skills).forEach(k => state.skills[k] = 0);
 
-    // Застосовуємо значення з архетипу
     for (const [key, val] of Object.entries(archetype.values)) {
         if (state.skills[key] !== undefined) {
             state.skills[key] = val;
@@ -257,7 +263,7 @@ function renderPredatorTypes() {
                         <div class="flex flex-col gap-1">${discOpts}</div>
                     </div>
                     <div>
-                        <span class="block text-[11px] font-bold text-[#4b0082] uppercase tracking-widest mb-1">Оберіть спеціалізацію (+1 крапка)</span>
+                        <span class="block text-[11px] font-bold text-[#4b0082] uppercase tracking-widest mb-1">Оберіть спеціалізацію (+1 крапка / Спеціалізація)</span>
                         <div class="flex flex-col gap-1">${skillOpts}</div>
                     </div>
                 </div>
@@ -405,112 +411,16 @@ function handleDotClick(type, id, clickedIndex, baseValue, min) {
     if (type === 'attribute') {
         state.attributes[id] = newValue;
         renderAttributes();
-        document.getElementById('attr-archetype-select').value = ""; // Скидаємо селект при ручній зміні
+        document.getElementById('attr-archetype-select').value = ""; 
     } else if (type === 'skill') {
         state.skills[id] = newValue;
         renderSkills();
-        document.getElementById('skill-archetype-select').value = ""; // Скидаємо селект при ручній зміні
+        document.getElementById('skill-archetype-select').value = ""; 
     } else if (type === 'discipline') {
         state.disciplines[id] = newValue;
         renderDisciplines();
     }
     updateTrackers();
-}
-
-function renderDisciplines() {
-    const grid = document.getElementById('disciplines-grid');
-    let availableDisc = [...(clansData[state.clan]?.disciplines || [])];
-    
-    if (state.predatorChoices.discipline && !availableDisc.includes(state.predatorChoices.discipline)) {
-        availableDisc.push(state.predatorChoices.discipline);
-    }
-    
-    if (state.manualDisciplines) {
-        state.manualDisciplines.forEach(d => {
-            if (!availableDisc.includes(d)) availableDisc.push(d);
-        });
-    }
-    
-    let html = '<div class="space-y-6 bg-white p-6 border border-gray-200 rounded-lg">';
-    
-    if(availableDisc.length === 0) {
-        html += '<p class="text-gray-500">Для цього клану немає доступних дисциплін у базі.</p>';
-    }
-
-    availableDisc.forEach(discKey => {
-        const discInfo = getDisciplineInfo(discKey);
-        const ukrName = discInfo.name || discKey; 
-        let bonus = (state.predatorChoices.discipline === discKey) ? 1 : 0;
-        let baseDots = state.disciplines[discKey] || 0;
-        let totalDots = baseDots + bonus;
-        
-        if(!state.disciplinePowers[discKey]) state.disciplinePowers[discKey] = {};
-
-        html += `
-            <div class="group border-b border-gray-100 pb-6 last:border-0 last:pb-0">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="font-serif text-xl font-bold text-gray-800 group-hover:text-[#8b0000] transition-colors">${ukrName}</span>
-                    ${createDotsHTML('discipline', discKey, baseDots, 5, bonus)}
-                </div>
-                <p class="text-sm text-gray-500 text-justify leading-relaxed mb-4">${discInfo.desc || ''}</p>
-        `;
-
-        if (totalDots > 0) {
-            html += `<div class="bg-gray-50 border-l-2 border-[#8b0000] p-4 rounded-r-lg space-y-4">
-                        <h4 class="text-xs font-bold uppercase tracking-widest text-gray-800">Вибір здібностей</h4>`;
-            
-            let powersList = disciplinesPowersMap[discKey] || [];
-
-            for (let dotLevel = 1; dotLevel <= totalDots; dotLevel++) {
-                let availablePowers = powersList.filter(p => Number(p.level) <= totalDots);
-                
-                let optionsHtml = `<option value="">-- Оберіть здібність (макс. рівень ${totalDots}) --</option>`;
-                availablePowers.forEach(p => {
-                    let isSelected = state.disciplinePowers[discKey][dotLevel] === p.id;
-                    let reqText = (p.requirement && String(p.requirement).trim().toLowerCase() !== 'немає' && String(p.requirement).trim() !== '') ? ` [Вимога: ${p.requirement}]` : '';
-                    optionsHtml += `<option value="${p.id}" ${isSelected ? 'selected' : ''}>Рівень ${p.level}: ${p.name}${reqText}</option>`;
-                });
-
-                let selectedDesc = '';
-                let selectedPowerId = state.disciplinePowers[discKey][dotLevel];
-                if (selectedPowerId) {
-                    let foundPower = availablePowers.find(p => p.id === selectedPowerId);
-                    if (foundPower) {
-                        selectedDesc = `
-                            <div class="mt-2 text-xs text-gray-600 bg-white p-2.5 rounded border border-gray-100 space-y-1">
-                                <p class="italic leading-snug">${foundPower.desc}</p>
-                                ${(foundPower.requirement && String(foundPower.requirement).trim().toLowerCase() !== 'немає' && String(foundPower.requirement).trim() !== '') ? `<p><strong>Вимога:</strong> ${foundPower.requirement}</p>` : ''}
-                                ${(foundPower.rouseCost && String(foundPower.rouseCost).trim().toLowerCase() !== 'немає' && String(foundPower.rouseCost).trim() !== '') ? `<p><strong>Збурення:</strong> ${foundPower.rouseCost}</p>` : ''}
-                                ${(foundPower.dicePool && String(foundPower.dicePool).trim().toLowerCase() !== 'немає' && String(foundPower.dicePool).trim() !== '') ? `<p><strong>Пул кубиків:</strong> ${foundPower.dicePool}</p>` : ''}
-                                ${(foundPower.resistance && String(foundPower.resistance).trim().toLowerCase() !== 'немає' && String(foundPower.resistance).trim() !== '') ? `<p><strong>Опір:</strong> ${foundPower.resistance}</p>` : ''}
-                            </div>
-                        `;
-                    }
-                }
-
-                html += `
-                    <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
-                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">Здібність за ${dotLevel}-ю крапку</label>
-                        <select onchange="setDisciplinePower('${discKey}', ${dotLevel}, this.value)" class="w-full bg-gray-50 border border-gray-300 rounded px-2 py-1.5 text-sm font-semibold text-gray-800 outline-none focus:border-[#8b0000]">
-                            ${optionsHtml}
-                        </select>
-                        ${selectedDesc}
-                    </div>
-                `;
-            }
-            html += `</div>`;
-        }
-        
-        html += `</div>`;
-    });
-    html += '</div>';
-    grid.innerHTML = html;
-}
-
-function setDisciplinePower(discKey, dotLevel, powerId) {
-    if(!state.disciplinePowers[discKey]) state.disciplinePowers[discKey] = {};
-    state.disciplinePowers[discKey][dotLevel] = powerId;
-    renderDisciplines();
 }
 
 function renderAttributes() {
@@ -543,6 +453,11 @@ function renderAttributes() {
     });
 }
 
+function updateSkillSpec(skillId, val) {
+    if (!state.skillSpecs) state.skillSpecs = {};
+    state.skillSpecs[skillId] = val;
+}
+
 function renderSkills() {
     const grid = document.getElementById('skills-grid');
     grid.innerHTML = '';
@@ -554,12 +469,40 @@ function renderSkills() {
     categories.forEach(cat => {
         let colHTML = `<div><h3 class="text-xl font-bold text-gray-800 border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-wider">${cat.label}</h3><div class="space-y-3">`;
         (skillsData[cat.key] || []).forEach(skill => {
-            let bonus = (state.predatorChoices.skill === skill.id) ? 1 : 0;
+            
+            // Логіка хижака та спеціалізацій
+            let isPredSkill = (state.predatorChoices && state.predatorChoices.skill === skill.id);
+            let predSpecName = (state.predatorChoices && state.predatorChoices.specName) ? state.predatorChoices.specName : '';
+            let baseDots = state.skills[skill.id] || 0;
+            
+            let bonus = 0;
+            let userSpec = state.skillSpecs[skill.id] || '';
+            let displaySpec = userSpec;
+
+            if (isPredSkill) {
+                if (baseDots === 0) {
+                    bonus = 1; // Отримує бонусну крапку, якщо базових немає
+                } else if (predSpecName) {
+                    // Якщо є хоча б 1 базова крапка, отримує специфікацію хижака замість крапки
+                    if (userSpec.trim() === '') {
+                        displaySpec = predSpecName;
+                    } else if (!userSpec.includes(predSpecName)) {
+                        displaySpec = predSpecName + ", " + userSpec;
+                    }
+                }
+            }
             
             colHTML += `
-                <div class="flex justify-between items-center group">
-                    <span class="font-serif text-base text-gray-700 group-hover:text-[#8b0000] transition-colors">${skill.name}</span>
-                    ${createDotsHTML('skill', skill.id, state.skills[skill.id], 5, bonus)}
+                <div class="flex flex-col mb-1 group">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-serif text-base text-gray-700 group-hover:text-[#8b0000] transition-colors">${skill.name}</span>
+                        ${createDotsHTML('skill', skill.id, baseDots, 5, bonus)}
+                    </div>
+                    <input type="text"
+                           placeholder="Спеціалізація..."
+                           value="${displaySpec}"
+                           onblur="updateSkillSpec('${skill.id}', this.value)"
+                           class="w-full bg-transparent border-b border-gray-200 px-1 py-0.5 text-xs text-gray-600 outline-none focus:border-[#8b0000] focus:bg-gray-50 placeholder-gray-300 transition-colors">
                 </div>
             `;
         });
@@ -599,7 +542,6 @@ function populateAdvantageCategories() {
     const select = document.getElementById('adv-category-filter');
     if (!select || !state.advantagesData) return;
     
-    // Дістаємо всі унікальні категорії і сортуємо за алфавітом
     const categories = [...new Set(state.advantagesData.map(item => item.category).filter(Boolean))].sort((a, b) => a.localeCompare(b));
     
     let html = '<option value="all">Всі категорії</option>';
@@ -766,7 +708,7 @@ function changeClan(clanId) {
     
     Object.keys(state.disciplines).forEach(k => state.disciplines[k] = 0);
     state.disciplinePowers = {}; 
-    state.manualDisciplines = []; // Скидаємо вручну додані дисципліни при зміні клану
+    state.manualDisciplines = []; 
 
     renderDisciplines();
     updateTrackers();
@@ -785,15 +727,94 @@ function updateHeaderInfo() {
     if (headerClan) headerClan.innerText = clanName;
 }
 
-function populateCustomSpecDropdown() {
-    const select = document.getElementById('spec-custom-skill');
-    select.innerHTML = '<option value="">-- Оберіть навичку --</option>';
-    let allSkills = [];
-    Object.values(skillsData).forEach(arr => { allSkills = allSkills.concat(arr); });
-    allSkills.sort((a, b) => a.name.localeCompare(b.name));
-    allSkills.forEach(skill => {
-        select.innerHTML += `<option value="${skill.id}">${skill.name}</option>`;
+function renderDisciplines() {
+    const grid = document.getElementById('disciplines-grid');
+    let availableDisc = [...(clansData[state.clan]?.disciplines || [])];
+    
+    if (state.predatorChoices.discipline && !availableDisc.includes(state.predatorChoices.discipline)) {
+        availableDisc.push(state.predatorChoices.discipline);
+    }
+    
+    if (state.manualDisciplines) {
+        state.manualDisciplines.forEach(d => {
+            if (!availableDisc.includes(d)) availableDisc.push(d);
+        });
+    }
+    
+    let html = '<div class="space-y-6 bg-white p-6 border border-gray-200 rounded-lg">';
+    
+    if(availableDisc.length === 0) {
+        html += '<p class="text-gray-500">Для цього клану немає доступних дисциплін у базі.</p>';
+    }
+
+    availableDisc.forEach(discKey => {
+        const discInfo = getDisciplineInfo(discKey);
+        const ukrName = discInfo.name || discKey; 
+        let bonus = (state.predatorChoices.discipline === discKey) ? 1 : 0;
+        let baseDots = state.disciplines[discKey] || 0;
+        let totalDots = baseDots + bonus;
+        
+        if(!state.disciplinePowers[discKey]) state.disciplinePowers[discKey] = {};
+
+        html += `
+            <div class="group border-b border-gray-100 pb-6 last:border-0 last:pb-0">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-serif text-xl font-bold text-gray-800 group-hover:text-[#8b0000] transition-colors">${ukrName}</span>
+                    ${createDotsHTML('discipline', discKey, baseDots, 5, bonus)}
+                </div>
+                <p class="text-sm text-gray-500 text-justify leading-relaxed mb-4">${discInfo.desc || ''}</p>
+        `;
+
+        if (totalDots > 0) {
+            html += `<div class="bg-gray-50 border-l-2 border-[#8b0000] p-4 rounded-r-lg space-y-4">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-gray-800">Вибір здібностей</h4>`;
+            
+            let powersList = disciplinesPowersMap[discKey] || [];
+
+            for (let dotLevel = 1; dotLevel <= totalDots; dotLevel++) {
+                let availablePowers = powersList.filter(p => Number(p.level) <= totalDots);
+                
+                let optionsHtml = `<option value="">-- Оберіть здібність (макс. рівень ${totalDots}) --</option>`;
+                availablePowers.forEach(p => {
+                    let isSelected = state.disciplinePowers[discKey][dotLevel] === p.id;
+                    let reqText = (p.requirement && String(p.requirement).trim().toLowerCase() !== 'немає' && String(p.requirement).trim() !== '') ? ` [Вимога: ${p.requirement}]` : '';
+                    optionsHtml += `<option value="${p.id}" ${isSelected ? 'selected' : ''}>Рівень ${p.level}: ${p.name}${reqText}</option>`;
+                });
+
+                let selectedDesc = '';
+                let selectedPowerId = state.disciplinePowers[discKey][dotLevel];
+                if (selectedPowerId) {
+                    let foundPower = availablePowers.find(p => p.id === selectedPowerId);
+                    if (foundPower) {
+                        selectedDesc = `
+                            <div class="mt-2 text-xs text-gray-600 bg-white p-2.5 rounded border border-gray-100 space-y-1">
+                                <p class="italic leading-snug">${foundPower.desc}</p>
+                                ${(foundPower.requirement && String(foundPower.requirement).trim().toLowerCase() !== 'немає' && String(foundPower.requirement).trim() !== '') ? `<p><strong>Вимога:</strong> ${foundPower.requirement}</p>` : ''}
+                                ${(foundPower.rouseCost && String(foundPower.rouseCost).trim().toLowerCase() !== 'немає' && String(foundPower.rouseCost).trim() !== '') ? `<p><strong>Збурення:</strong> ${foundPower.rouseCost}</p>` : ''}
+                                ${(foundPower.dicePool && String(foundPower.dicePool).trim().toLowerCase() !== 'немає' && String(foundPower.dicePool).trim() !== '') ? `<p><strong>Пул кубиків:</strong> ${foundPower.dicePool}</p>` : ''}
+                                ${(foundPower.resistance && String(foundPower.resistance).trim().toLowerCase() !== 'немає' && String(foundPower.resistance).trim() !== '') ? `<p><strong>Опір:</strong> ${foundPower.resistance}</p>` : ''}
+                            </div>
+                        `;
+                    }
+                }
+
+                html += `
+                    <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">Здібність за ${dotLevel}-ю крапку</label>
+                        <select onchange="setDisciplinePower('${discKey}', ${dotLevel}, this.value)" class="w-full bg-gray-50 border border-gray-300 rounded px-2 py-1.5 text-sm font-semibold text-gray-800 outline-none focus:border-[#8b0000]">
+                            ${optionsHtml}
+                        </select>
+                        ${selectedDesc}
+                    </div>
+                `;
+            }
+            html += `</div>`;
+        }
+        
+        html += `</div>`;
     });
+    html += '</div>';
+    grid.innerHTML = html;
 }
 
 function goToStep(step) {
@@ -912,7 +933,7 @@ function finishGen() {
     let summaryHTML = '';
     const cats = [{ key: 'physical', label: 'Фізичні' }, { key: 'social', label: 'Соціальні' }, { key: 'mental', label: 'Ментальні' }];
 
-    // СЕКЦІЯ 1: КОНЦЕПТ ТА КЛАН (Вкладка 1)
+    // СЕКЦІЯ 1: КОНЦЕПТ ТА КЛАН
     summaryHTML += `
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
             <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">1. Концепт та Кров</h3>
@@ -930,7 +951,7 @@ function finishGen() {
         </div>
     `;
 
-    // СЕКЦІЯ 2: ХАРАКТЕРИСТИКИ (Вкладка 2)
+    // СЕКЦІЯ 2: ХАРАКТЕРИСТИКИ 
     summaryHTML += `
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
             <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">2. Характеристики</h3>
@@ -945,45 +966,43 @@ function finishGen() {
     });
     summaryHTML += `</div></div>`;
 
-    // СЕКЦІЯ 3: НАВИЧКИ ТА СПЕЦІАЛІЗАЦІЇ (Вкладка 3)
-    let specAcademics = document.getElementById('spec-academics')?.value || '';
-    let specCraft = document.getElementById('spec-craft')?.value || '';
-    let specPerformance = document.getElementById('spec-performance')?.value || '';
-    let specScience = document.getElementById('spec-science')?.value || '';
-    let customSpecName = document.getElementById('spec-custom-name')?.value || '';
-    let customSpecSkill = document.getElementById('spec-custom-skill')?.value || '';
-
+    // СЕКЦІЯ 3: НАВИЧКИ ТА СПЕЦІАЛІЗАЦІЇ
     summaryHTML += `
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
             <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">3. Навички та Спеціалізації</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     `;
     cats.forEach(cat => {
         summaryHTML += `<div><h4 class="font-bold text-xs text-gray-400 uppercase mb-3">${cat.label}</h4><div class="space-y-2">`;
         (skillsData[cat.key] || []).forEach(skill => {
-            let totalDots = state.skills[skill.id] + (state.predatorChoices.skill === skill.id ? 1 : 0);
+            let isPredSkill = (state.predatorChoices && state.predatorChoices.skill === skill.id);
+            let predSpecName = (state.predatorChoices && state.predatorChoices.specName) ? state.predatorChoices.specName : '';
+            let baseDots = state.skills[skill.id] || 0;
+            let bonusDots = 0;
+            
+            let userSpec = state.skillSpecs[skill.id] || '';
+            let finalSpec = userSpec;
+
+            if (isPredSkill) {
+                if (baseDots === 0) {
+                    bonusDots = 1;
+                } else if (predSpecName) {
+                    if (finalSpec.trim() === '') finalSpec = predSpecName;
+                    else if (!finalSpec.includes(predSpecName)) finalSpec = predSpecName + ", " + finalSpec;
+                }
+            }
+
+            let totalDots = baseDots + bonusDots;
             if (totalDots > 0) {
-                let specText = (state.predatorChoices.skill === skill.id && state.predatorChoices.specName) ? ` <span class="text-[10px] text-gray-500 font-normal">(${state.predatorChoices.specName})</span>` : '';
+                let specText = finalSpec ? ` <span class="text-[10px] text-gray-500 font-normal">(${finalSpec})</span>` : '';
                 summaryHTML += `<div class="flex justify-between items-center text-sm border-b border-gray-100 pb-1"><span class="font-serif font-bold text-gray-800">${skill.name}${specText}</span> <span>${createSummaryDots(totalDots)}</span></div>`;
             }
         });
         summaryHTML += `</div></div>`;
     });
-    summaryHTML += `</div>`;
+    summaryHTML += `</div></div>`;
 
-    // Виведення спеціалізацій
-    summaryHTML += `
-        <div class="border-t border-gray-200 pt-4 text-xs text-gray-700 grid grid-cols-2 md:grid-cols-4 gap-4">
-            ${specAcademics ? `<div><strong>Знання:</strong> ${specAcademics}</div>` : ''}
-            ${specCraft ? `<div><strong>Ремесло:</strong> ${specCraft}</div>` : ''}
-            ${specPerformance ? `<div><strong>Виступ:</strong> ${specPerformance}</div>` : ''}
-            ${specScience ? `<div><strong>Наука:</strong> ${specScience}</div>` : ''}
-            ${customSpecName ? `<div class="col-span-full"><strong>Додаткова спец. (${customSpecSkill}):</strong> ${customSpecName}</div>` : ''}
-            ${state.predatorChoices.specName ? `<div class="col-span-full text-indigo-800"><strong>Спеціалізація хижака:</strong> ${state.predatorChoices.specName}</div>` : ''}
-        </div>
-    </div>`;
-
-    // СЕКЦІЯ 4: ХИЖАЦЬКІ ЗВИЧКИ (Вкладка 4)
+    // СЕКЦІЯ 4: ХИЖАЦЬКІ ЗВИЧКИ
     summaryHTML += `
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
             <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">4. Хижацькі звички</h3>
@@ -995,7 +1014,7 @@ function finishGen() {
         </div>
     `;
 
-    // СЕКЦІЯ 5: ДИСЦИПЛІНИ ТА ЗДІБНОСТІ (Вкладка 5)
+    // СЕКЦІЯ 5: ДИСЦИПЛІНИ ТА ЗДІБНОСТІ
     summaryHTML += `
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
             <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">5. Дисципліни та Здібності</h3>
@@ -1003,7 +1022,7 @@ function finishGen() {
     `;
     
     let availableDisc = [...(clansData[state.clan]?.disciplines || [])];
-    if (state.predatorChoices.discipline && !availableDisc.includes(state.predatorChoices.discipline)) {
+    if (state.predatorChoices && state.predatorChoices.discipline && !availableDisc.includes(state.predatorChoices.discipline)) {
         availableDisc.push(state.predatorChoices.discipline);
     }
     if (state.manualDisciplines) {
@@ -1014,7 +1033,7 @@ function finishGen() {
 
     let hasDisciplines = false;
     availableDisc.forEach(discKey => {
-        let totalDots = (state.disciplines[discKey] || 0) + (state.predatorChoices.discipline === discKey ? 1 : 0);
+        let totalDots = (state.disciplines[discKey] || 0) + (state.predatorChoices && state.predatorChoices.discipline === discKey ? 1 : 0);
         if (totalDots > 0) {
             hasDisciplines = true;
             const discInfo = getDisciplineInfo(discKey);
@@ -1057,7 +1076,7 @@ function finishGen() {
     }
     summaryHTML += `</div></div>`;
 
-    // СЕКЦІЯ 6: БЛАГА ТА ВАДИ (Вкладка 6)
+    // СЕКЦІЯ 6: БЛАГА ТА ВАДИ
     summaryHTML += `
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
             <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">6. Блага та Вади</h3>
