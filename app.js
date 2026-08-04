@@ -35,6 +35,7 @@ async function fetchAllData() {
             fetch('data/vtm_merits_data.json'),
             fetch('data/vtm_predator-types_1'),
             fetch('data.js'),
+            fetch('vtm_clans'),
             fetch('data/vtm_disciplines'),
             fetch('data/vtm_archetypes.json') 
         ]);
