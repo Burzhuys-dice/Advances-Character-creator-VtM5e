@@ -31,12 +31,12 @@ async function init() {
 
 async function fetchAllData() {
     try {
-        const [advRes, predRes, clansRes, discRes, archRes] = await Promise.all([
-            fetch('data/vtm_merits_data.json'), 
-            fetch('data/vtm_predator-types_1'), 
-            fetch('data/vtm_clans'), 
-            fetch('data/vtm_disciplines'), 
-            fetch('data/vtm_archetypes.json')
+        const [advRes, predRes, coreRes, clansRes, discRes, archRes] = await Promise.all([
+            fetch('data/vtm_merits_data.json'),
+            fetch('data/vtm_predator-types_1'),
+            fetch('data.js'),
+            fetch('data/vtm_disciplines'),
+            fetch('data/vtm_archetypes.json') 
         ]);
 
         if(advRes.ok) {
@@ -48,13 +48,31 @@ async function fetchAllData() {
         if(predRes.ok) state.predatorData = await predRes.json();
         renderPredatorTypes();
 
-        // Якщо core-дані є в data.js (наприклад, у змінній типу defaultAttributes або подібній)
-        if (typeof attributesData !== 'undefined') {
-            // Дані вже підтягнулися з data.js через скрипт в html
+        if(coreRes.ok) {
+            const coreData = await coreRes.json();
+            if(coreData.attributes) {
+                // Зберігаємо desc з data.js перед оновленням attributesData
+                Object.keys(coreData.attributes).forEach(cat => {
+                    if (attributesData && attributesData[cat]) {
+                        coreData.attributes[cat].forEach(fetchedAttr => {
+                            const localAttr = attributesData[cat].find(a => a.id === fetchedAttr.id);
+                            if (localAttr && localAttr.desc && !fetchedAttr.desc) {
+                                fetchedAttr.desc = localAttr.desc;
+                            }
+                        });
+                    }
+                });
+                attributesData = coreData.attributes;
+            }
+            if(coreData.skills) {
+                if(coreData.skills.physical) skillsData.physical = coreData.skills.physical;
+                if(coreData.skills.social) skillsData.social = coreData.skills.social;
+                if(coreData.skills.mental) skillsData.mental = coreData.skills.mental;
+            }
         }
 
         if(clansRes.ok) {
-            const cData = await clansRes.js();
+            const cData = await clansRes.json();
             if (Array.isArray(cData)) {
                 clansData = {};
                 cData.forEach(clan => {
@@ -67,8 +85,10 @@ async function fetchAllData() {
 
         if(discRes.ok) {
             const dJson = await discRes.json();
+            
             let discKeys = Array.isArray(disciplinesData) ? disciplinesData.map(d => d.id) : Object.keys(disciplinesData);
             discKeys.forEach(k => disciplinesPowersMap[k] = []);
+
             let rawPowers = dJson.powers || (Array.isArray(dJson) ? dJson : []);
             if (Array.isArray(rawPowers)) {
                 rawPowers.forEach(power => {
@@ -88,19 +108,6 @@ async function fetchAllData() {
                 });
             }
         }
-
-        if(archRes && archRes.ok) {
-            state.archetypesData = await archRes.json();
-        }
-
-        populateArchetypes();
-        populateManualDisciplineDropdown();
-
-    } catch (error) {
-        console.error('Помилка завантаження даних:', error);
-        document.getElementById('loading-status').innerText = 'Помилка завантаження даних';
-    }
-}
 
         if(archRes && archRes.ok) {
             state.archetypesData = await archRes.json();
@@ -815,6 +822,9 @@ function goToStep(step) {
     }
     document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
     document.getElementById(`step-${step}`).classList.add('active');
+
+    // Автоматичний показ довідки при переході на вкладку
+    showStepGuideModal(step);
 
     [1, 2, 3, 4, 5, 6, 7].forEach(i => {
         const btn = document.getElementById(`nav-step-${i}`);
