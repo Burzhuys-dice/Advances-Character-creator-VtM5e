@@ -34,7 +34,6 @@ async function fetchAllData() {
         const [advRes, predRes, coreRes, clansRes, discRes, archRes] = await Promise.all([
             fetch('data/vtm_merits_data.json'),
             fetch('data/vtm_predator-types_1'),
-            fetch('data/vtm_char_and_skills'),
             fetch('data.js'),
             fetch('data/vtm_disciplines'),
             fetch('data/vtm_archetypes.json') 
