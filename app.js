@@ -32,11 +32,12 @@ async function init() {
 async function fetchAllData() {
     try {
         const [advRes, predRes, coreRes, clansRes, discRes, archRes] = await Promise.all([
-            fetch('data/vtm_merits_data.json'), 
-            fetch('data/vtm_predator-types_1'),  
-            fetch('data/vtm_clans'), 
-            fetch('data/vtm_disciplines'), 
-            fetch('data/vtm_archetypes.json')
+            fetch('data/vtm_merits_data.json'),
+            fetch('data/vtm_predator-types_1'),
+            fetch('data/vtm_char_and_skills'),
+            fetch('data.js'),
+            fetch('data/vtm_disciplines'),
+            fetch('data/vtm_archetypes.json') 
         ]);
 
         if(advRes.ok) {
@@ -51,6 +52,7 @@ async function fetchAllData() {
         if(coreRes.ok) {
             const coreData = await coreRes.json();
             if(coreData.attributes) {
+                // Зберігаємо desc з data.js перед оновленням attributesData
                 Object.keys(coreData.attributes).forEach(cat => {
                     if (attributesData && attributesData[cat]) {
                         coreData.attributes[cat].forEach(fetchedAttr => {
@@ -84,8 +86,10 @@ async function fetchAllData() {
 
         if(discRes.ok) {
             const dJson = await discRes.json();
+            
             let discKeys = Array.isArray(disciplinesData) ? disciplinesData.map(d => d.id) : Object.keys(disciplinesData);
             discKeys.forEach(k => disciplinesPowersMap[k] = []);
+
             let rawPowers = dJson.powers || (Array.isArray(dJson) ? dJson : []);
             if (Array.isArray(rawPowers)) {
                 rawPowers.forEach(power => {
@@ -109,7 +113,6 @@ async function fetchAllData() {
         if(archRes && archRes.ok) {
             state.archetypesData = await archRes.json();
         }
-
         populateArchetypes();
         populateManualDisciplineDropdown();
 
@@ -820,9 +823,6 @@ function goToStep(step) {
     }
     document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
     document.getElementById(`step-${step}`).classList.add('active');
-
-    // Автоматичний показ довідки при переході на вкладку
-    showStepGuideModal(step);
 
     [1, 2, 3, 4, 5, 6, 7].forEach(i => {
         const btn = document.getElementById(`nav-step-${i}`);
