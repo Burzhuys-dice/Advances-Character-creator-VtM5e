@@ -34,8 +34,8 @@ async function fetchAllData() {
         const [advRes, predRes, coreRes, clansRes, discRes, archRes] = await Promise.all([
             fetch('data/vtm_merits_data.json'),
             fetch('data/vtm_predator-types_1'),
-            fetch('data.js'),
-            fetch('data/vtm_clans'),
+            fetch('data/vtm_char_and_skills'),
+            fetch('data.'),
             fetch('data/vtm_disciplines'),
             fetch('data/vtm_archetypes.json') 
         ]);
@@ -493,16 +493,16 @@ function renderSkills() {
             }
             
             colHTML += `
-                <div class="flex flex-col mb-1 group">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-serif text-base text-gray-700 group-hover:text-[#8b0000] transition-colors">${skill.name}</span>
+                <div class="flex justify-between items-center group gap-2">
+                    <span class="font-serif text-base text-gray-700 group-hover:text-[#8b0000] transition-colors whitespace-nowrap min-w-max">${skill.name}</span>
+                    <input type="text"
+                           placeholder="спец..."
+                           value="${displaySpec}"
+                           oninput="updateSkillSpec('${skill.id}', this.value)"
+                           class="flex-grow w-10 bg-transparent border-b border-dashed border-gray-300 px-1 py-0.5 text-xs text-center text-gray-800 outline-none focus:border-[#8b0000] focus:bg-gray-50 placeholder-gray-300 transition-colors">
+                    <div class="min-w-max">
                         ${createDotsHTML('skill', skill.id, baseDots, 5, bonus)}
                     </div>
-                    <input type="text"
-                           placeholder="Спеціалізація..."
-                           value="${displaySpec}"
-                           onblur="updateSkillSpec('${skill.id}', this.value)"
-                           class="w-full bg-transparent border-b border-gray-200 px-1 py-0.5 text-xs text-gray-600 outline-none focus:border-[#8b0000] focus:bg-gray-50 placeholder-gray-300 transition-colors">
                 </div>
             `;
         });
