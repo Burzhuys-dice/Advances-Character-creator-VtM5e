@@ -45,12 +45,15 @@ function showStepGuideModal(stepNumber) {
 
     // Перевіряємо, чи вже існує модальне вікно, якщо ні — створюємо
     let modal = document.getElementById('step-guide-modal');
+    modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeStepGuideModal();
+});
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'step-guide-modal';
         modal.className = 'fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-[fadeIn_0.2s_ease-in-out]';
         modal.innerHTML = `
-            <div class="bg-white max-w-lg w-full rounded-xl shadow-2xl border-2 border-[#8b0000] overflow-hidden flex flex-col">
+            <div class="bg-white max-w-3xl w-full rounded-xl shadow-2xl border-2 border-[#8b0000] overflow-hidden flex flex-col">
                 <div class="bg-[#1a1a1a] text-white p-4 flex justify-between items-center border-b-4 border-[#8b0000]">
                     <h3 id="modal-title" class="font-serif font-bold text-lg uppercase tracking-wider text-red-500">Довідка</h3>
                     <button onclick="closeStepGuideModal()" class="text-gray-400 hover:text-white text-xl font-bold px-2">&times;</button>
