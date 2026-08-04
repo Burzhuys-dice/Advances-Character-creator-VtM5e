@@ -824,6 +824,9 @@ function goToStep(step) {
     document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
     document.getElementById(`step-${step}`).classList.add('active');
 
+    // Автоматичний показ довідки при переході на вкладку
+    showStepGuideModal(step);
+
     [1, 2, 3, 4, 5, 6, 7].forEach(i => {
         const btn = document.getElementById(`nav-step-${i}`);
         if(btn) {
