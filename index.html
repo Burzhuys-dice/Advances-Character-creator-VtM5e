@@ -60,7 +60,12 @@
         <section id="step-1" class="step-container active bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-200">
             <h2 class="text-3xl font-bold text-[#8b0000] mb-6 vtm-font uppercase">Концепт Персонажа</h2>
             <p class="text-gray-600 mb-8">Хто ви у цьому Світі Темряви? Опишіть вашу ідею та оберіть вашу кров.</p>
-            
+            <div class="flex justify-between items-center mb-6">
+    <h2 class="text-3xl font-bold text-[#8b0000] vtm-font uppercase">Назва кроку</h2>
+    <button onclick="showStepGuideModal(1)" class="px-3 py-1 bg-gray-100 hover:bg-[#8b0000] hover:text-white text-gray-700 rounded text-xs font-bold uppercase tracking-wider transition-colors border border-gray-300 flex items-center gap-1">
+        ℹ Довідка
+    </button>
+</div>
             <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 uppercase tracking-wider mb-2">Концепт (Коротка фраза)</label>
@@ -102,6 +107,12 @@
 
         <!-- STEP 2: ATTRIBUTES -->
         <section id="step-2" class="step-container bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-200">
+           <div class="flex justify-between items-center mb-6">
+    <h2 class="text-3xl font-bold text-[#8b0000] vtm-font uppercase">Назва кроку</h2>
+    <button onclick="showStepGuideModal(1)" class="px-3 py-1 bg-gray-100 hover:bg-[#8b0000] hover:text-white text-gray-700 rounded text-xs font-bold uppercase tracking-wider transition-colors border border-gray-300 flex items-center gap-1">
+        ℹ Довідка
+    </button>
+</div>
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h2 class="text-3xl font-bold text-[#8b0000] vtm-font uppercase">Характеристики</h2>
                 <div class="bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 shadow-inner w-full md:w-auto">
@@ -310,5 +321,6 @@
 
     <script src="data.js"></script>
     <script src="app.js"></script>
+    <script src="steps_guide.js"></script>
 </body>
 </html>
