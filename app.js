@@ -54,7 +54,7 @@ async function fetchAllData() {
         }
 
         if(clansRes.ok) {
-            const cData = await clansRes.json();
+            const cData = await clansRes.js();
             if (Array.isArray(cData)) {
                 clansData = {};
                 cData.forEach(clan => {
