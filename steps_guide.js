@@ -45,9 +45,6 @@ function showStepGuideModal(stepNumber) {
 
     // Перевіряємо, чи вже існує модальне вікно, якщо ні — створюємо
     let modal = document.getElementById('step-guide-modal');
-    modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeStepGuideModal();
-});
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'step-guide-modal';
