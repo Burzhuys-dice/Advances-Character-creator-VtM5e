@@ -31,13 +31,12 @@ async function init() {
 
 async function fetchAllData() {
     try {
-        const [advRes, predRes, coreRes, clansRes, discRes, archRes] = await Promise.all([
-            fetch('data/vtm_merits_data.json'),
-            fetch('data/vtm_predator-types_1'),
-            fetch('data.js'),
-            fetch('vtm_clans'),
-            fetch('data/vtm_disciplines'),
-            fetch('data/vtm_archetypes.json') 
+        const [advRes, predRes, clansRes, discRes, archRes] = await Promise.all([
+            fetch('data/vtm_merits_data.json'), 
+            fetch('data/vtm_predator-types_1'), 
+            fetch('data/vtm_clans'), 
+            fetch('data/vtm_disciplines'), 
+            fetch('data/vtm_archetypes.json')
         ]);
 
         if(advRes.ok) {
@@ -49,27 +48,9 @@ async function fetchAllData() {
         if(predRes.ok) state.predatorData = await predRes.json();
         renderPredatorTypes();
 
-        if(coreRes.ok) {
-            const coreData = await coreRes.json();
-            if(coreData.attributes) {
-                // Зберігаємо desc з data.js перед оновленням attributesData
-                Object.keys(coreData.attributes).forEach(cat => {
-                    if (attributesData && attributesData[cat]) {
-                        coreData.attributes[cat].forEach(fetchedAttr => {
-                            const localAttr = attributesData[cat].find(a => a.id === fetchedAttr.id);
-                            if (localAttr && localAttr.desc && !fetchedAttr.desc) {
-                                fetchedAttr.desc = localAttr.desc;
-                            }
-                        });
-                    }
-                });
-                attributesData = coreData.attributes;
-            }
-            if(coreData.skills) {
-                if(coreData.skills.physical) skillsData.physical = coreData.skills.physical;
-                if(coreData.skills.social) skillsData.social = coreData.skills.social;
-                if(coreData.skills.mental) skillsData.mental = coreData.skills.mental;
-            }
+        // Якщо core-дані є в data.js (наприклад, у змінній типу defaultAttributes або подібній)
+        if (typeof attributesData !== 'undefined') {
+            // Дані вже підтягнулися з data.js через скрипт в html
         }
 
         if(clansRes.ok) {
@@ -86,10 +67,8 @@ async function fetchAllData() {
 
         if(discRes.ok) {
             const dJson = await discRes.json();
-            
             let discKeys = Array.isArray(disciplinesData) ? disciplinesData.map(d => d.id) : Object.keys(disciplinesData);
             discKeys.forEach(k => disciplinesPowersMap[k] = []);
-
             let rawPowers = dJson.powers || (Array.isArray(dJson) ? dJson : []);
             if (Array.isArray(rawPowers)) {
                 rawPowers.forEach(power => {
@@ -109,6 +88,19 @@ async function fetchAllData() {
                 });
             }
         }
+
+        if(archRes && archRes.ok) {
+            state.archetypesData = await archRes.json();
+        }
+
+        populateArchetypes();
+        populateManualDisciplineDropdown();
+
+    } catch (error) {
+        console.error('Помилка завантаження даних:', error);
+        document.getElementById('loading-status').innerText = 'Помилка завантаження даних';
+    }
+}
 
         if(archRes && archRes.ok) {
             state.archetypesData = await archRes.json();
