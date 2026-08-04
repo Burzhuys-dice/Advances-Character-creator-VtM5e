@@ -525,8 +525,15 @@ function renderAttributes() {
         let colHTML = `<div><h3 class="text-xl font-bold text-gray-800 border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-wider">${cat.label}</h3><div class="space-y-4">`;
         (attributesData[cat.key] || []).forEach(attr => {
             colHTML += `
-                <div class="flex justify-between items-center group">
-                    <span class="font-serif text-lg text-gray-700 group-hover:text-[#8b0000] transition-colors">${attr.name}</span>
+                <div class="flex justify-between items-center">
+                    <div class="group relative cursor-help flex-grow">
+                        <span class="font-serif text-lg text-gray-700 group-hover:text-[#8b0000] transition-colors border-b border-dashed border-gray-300 group-hover:border-[#8b0000] pb-0.5">${attr.name}</span>
+                        ${attr.desc ? `
+                        <div class="absolute left-0 top-full mt-2 hidden group-hover:block group-active:block w-56 p-3 bg-gray-900 text-gray-100 text-[11px] leading-relaxed rounded-lg shadow-xl z-50 pointer-events-none before:content-[''] before:absolute before:bottom-full before:left-4 before:border-4 before:border-transparent before:border-b-gray-900">
+                            ${attr.desc}
+                        </div>
+                        ` : ''}
+                    </div>
                     ${createDotsHTML('attribute', attr.id, state.attributes[attr.id], 5, 0)}
                 </div>
             `;
