@@ -302,6 +302,9 @@ function selectPredator(id) {
         state.selectedPredator = id;
         state.predatorChoices = { discipline: null, skill: null, specName: null };
         
+        // Очищаємо попередні переваги від хижака, щоб вони не накопичувались при зміні вибору
+        state.selectedAdvantages = state.selectedAdvantages.filter(adv => adv.source !== 'predator');
+        
         const predator = state.predatorData.find(p => p.id === id);
         if (predator) {
             if (predator.discipline_options && predator.discipline_options.length > 0) {
@@ -311,12 +314,31 @@ function selectPredator(id) {
                 state.predatorChoices.skill = predator.skill_options[0].id;
                 state.predatorChoices.specName = predator.skill_options[0].spec;
             }
+
+            // Додаємо нові переваги від хижака автоматично
+            if (predator.auto_advantages && Array.isArray(predator.auto_advantages)) {
+                predator.auto_advantages.forEach(autoAdv => {
+                    const item = state.advantagesData.find(i => String(i.id) === String(autoAdv.id));
+                    if (item) {
+                        state.selectedAdvantages.push({
+                            id: item.id,
+                            name: item.name,
+                            type: item.type,
+                            cost: autoAdv.cost,
+                            source: 'predator' // Мітка, щоб ігнорувати їх у лічильнику
+                        });
+                    }
+                });
+            }
         }
         
         renderPredatorTypes();
         applyPredatorGlobalUpdates();
+        renderSelectedAdvantages(); // Оновлюємо візуальний список
+        updateTrackers();           // Оновлюємо лічильники
     }
 }
+
 
 function setPredatorChoice(type, id, specName = null) {
     if (type === 'discipline') state.predatorChoices.discipline = id;
@@ -717,6 +739,12 @@ function renderSelectedAdvantages() {
     let html = '';
     state.selectedAdvantages.forEach((sel, index) => {
         let badgeClass = sel.type === 'flaw' ? 'bg-gray-800 text-white' : 'bg-red-100 text-red-800';
+        let isPredator = (sel.source === 'predator');
+        
+        // Якщо від хижака — показуємо бейдж замість кнопки видалення
+        let actionHTML = isPredator 
+            ? `<span class="text-[9px] font-bold text-[#4b0082] uppercase tracking-widest px-2 py-1 bg-purple-100 border border-purple-200 rounded">Від Хижака</span>`
+            : `<button onclick="removeAdvantage(${index})" class="text-red-500 hover:text-red-700 p-1 font-bold text-lg leading-none">&times;</button>`;
         
         html += `
             <div class="bg-white border border-gray-200 p-3 rounded-lg shadow-sm flex justify-between items-center animate-[fadeIn_0.3s_ease-in-out]">
@@ -728,7 +756,7 @@ function renderSelectedAdvantages() {
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="font-bold text-sm text-gray-700">${sel.cost} ⬤</span>
-                    <button onclick="removeAdvantage(${index})" class="text-red-500 hover:text-red-700 p-1 font-bold text-lg leading-none">&times;</button>
+                    ${actionHTML}
                 </div>
             </div>
         `;
@@ -900,9 +928,13 @@ function updateTrackers() {
     let totalMeritsDots = 0;
     let totalFlawsDots = 0;
     state.selectedAdvantages.forEach(adv => {
-        if (adv.type === 'flaw') totalFlawsDots += adv.cost;
-        else totalMeritsDots += adv.cost; 
+        // Ігноруємо безкоштовні переваги, які дав тип хижака
+        if (adv.source !== 'predator') {
+            if (adv.type === 'flaw') totalFlawsDots += adv.cost;
+            else totalMeritsDots += adv.cost; 
+        }
     });
+    
     const meritsEl = document.getElementById('merits-tracker');
     const flawsEl = document.getElementById('flaws-tracker');
 
@@ -1076,7 +1108,7 @@ function finishGen() {
     }
     summaryHTML += `</div></div>`;
 
-    // СЕКЦІЯ 6: БЛАГА ТА ВАДИ (Вкладка 6)
+     // СЕКЦІЯ 6: БЛАГА ТА ВАДИ (Вкладка 6)
     summaryHTML += `
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
             <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">6. Блага та Вади</h3>
@@ -1089,11 +1121,14 @@ function finishGen() {
         state.selectedAdvantages.forEach(adv => {
             let badgeClass = adv.type === 'flaw' ? 'bg-gray-800 text-white' : 'bg-red-100 text-red-800';
             let label = adv.type === 'flaw' ? 'Вада' : 'Благо';
+            let predatorBadge = adv.source === 'predator' ? `<span class="ml-2 text-[9px] text-indigo-700 bg-indigo-50 border border-indigo-200 px-1 rounded uppercase tracking-wider print:hidden">Від хижака</span>` : '';
+            
             summaryHTML += `
                 <div class="flex justify-between items-center bg-white p-3 rounded border border-gray-200 print:border-gray-300 print:bg-transparent">
                     <div>
                         <span class="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${badgeClass} print:border print:border-gray-300 print:bg-transparent print:text-black">${label}</span>
                         <span class="font-serif font-bold text-gray-800 ml-2">${adv.name}</span>
+                        ${predatorBadge}
                     </div>
                     <span class="font-bold text-sm text-gray-700">${adv.cost} ⬤</span>
                 </div>
@@ -1101,7 +1136,6 @@ function finishGen() {
         });
     }
     summaryHTML += `</div></div>`;
-
     document.getElementById('summary-content').innerHTML = summaryHTML;
 }
 
