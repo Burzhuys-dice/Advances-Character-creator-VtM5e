@@ -130,7 +130,14 @@ function populateArchetypes() {
         skillSelect.innerHTML = html;
     }
 }
-
+const attrElement = document.createElement('div');
+attrElement.className = 'attribute-row';
+attrElement.innerHTML = `
+    <div class="attribute-info">
+        <span class="attribute-name">${attribute.name}</span>
+        <div class="attribute-desc">${attribute.desc || ''}</div>
+    </div>
+   
 // Застосування архетипу до характеристик
 function applyAttributeArchetype(archId) {
     if (!archId) return; // Якщо обрано "Вручну", не змінюємо поточні дані
