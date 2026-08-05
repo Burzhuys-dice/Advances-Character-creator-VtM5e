@@ -526,8 +526,13 @@ function renderAttributes() {
         (attributesData[cat.key] || []).forEach(attr => {
             colHTML += `
                 <div class="flex justify-between items-center group">
-                    <span class="font-serif text-lg text-gray-700 group-hover:text-[#8b0000] transition-colors">${attr.name}</span>
-                    ${createDotsHTML('attribute', attr.id, state.attributes[attr.id], 5, 0)}
+                    <div class="flex flex-col pr-4">
+                        <span class="font-serif text-lg text-gray-700 group-hover:text-[#8b0000] transition-colors">${attr.name}</span>
+                        ${attr.desc ? `<span class="text-xs text-gray-500 italic mt-0.5 leading-tight">${attr.desc}</span>` : ''}
+                    </div>
+                    <div class="shrink-0">
+                        ${createDotsHTML('attribute', attr.id, state.attributes[attr.id], 5, 0)}
+                    </div>
                 </div>
             `;
         });
