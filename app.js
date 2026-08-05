@@ -110,18 +110,23 @@ async function fetchAllData() {
 }
 async function generateRandomConviction(convictionFieldId, touchstoneFieldId) {
     try {
-        const response = await fetch('data/vtm_convictions.json');
+        const response = await fetch('vtm_convictions.json');
         if (!response.ok) {
             throw new Error('Не вдалося завантажити файл з переконаннями');
         }
         const data = await response.json();
         
-        // Оскільки структура має поля id та text
+        // Обираємо випадковий об'єкт з масиву (який містить і text, і touchstone)
         const randomItem = getRandomItem(data);
         
         const convField = document.getElementById(convictionFieldId);
+        const touchField = document.getElementById(touchstoneFieldId);
+        
         if (convField && randomItem) {
             convField.value = randomItem.text;
+        }
+        if (touchField && randomItem) {
+            touchField.value = randomItem.touchstone;
         }
     } catch (error) {
         console.error('Помилка завантаження переконань:', error);
