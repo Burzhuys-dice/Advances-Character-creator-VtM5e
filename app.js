@@ -123,7 +123,7 @@ async function generateRandomConviction(convictionFieldId, touchstoneFieldId) {
         const touchField = document.getElementById(touchstoneFieldId);
         
         if (convField && randomItem) {
-            convField.value = randomItem.text;
+            convField.value = randomItem.conviction;
         }
         if (touchField && randomItem) {
             touchField.value = randomItem.touchstone;
