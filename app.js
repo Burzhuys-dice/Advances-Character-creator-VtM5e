@@ -110,7 +110,7 @@ async function fetchAllData() {
 }
 async function generateRandomConviction(convictionFieldId, touchstoneFieldId) {
     try {
-        const response = await fetch('vtm_convictions.json');
+        const response = await fetch('data/vtm_convictions.json');
         if (!response.ok) {
             throw new Error('Не вдалося завантажити файл з переконаннями');
         }
