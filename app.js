@@ -108,7 +108,36 @@ async function fetchAllData() {
         document.getElementById('loading-status').innerText = 'Помилка завантаження даних';
     }
 }
+async function generateRandomConviction(convictionFieldId, touchstoneFieldId) {
+    try {
+        const response = await fetch('vtm_convictions.json');
+        if (!response.ok) {
+            throw new Error('Не вдалося завантажити файл з переконаннями');
+        }
+        const data = await response.json();
+        
+        // Оскільки структура має поля id та text
+        const randomItem = getRandomItem(data);
+        
+        const convField = document.getElementById(convictionFieldId);
+        if (convField && randomItem) {
+            convField.value = randomItem.text;
+        }
+    } catch (error) {
+        console.error('Помилка завантаження переконань:', error);
+    }
+}
+document.getElementById('btn-random-conviction1')?.addEventListener('click', () => {
+    generateRandomConviction('conviction1', 'touchstone1');
+});
 
+document.getElementById('btn-random-conviction2')?.addEventListener('click', () => {
+    generateRandomConviction('conviction2', 'touchstone2');
+});
+
+function getRandomItem(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
 // Заповнення випадаючих списків архетипів
 function populateArchetypes() {
     const attrSelect = document.getElementById('attr-archetype-select');
