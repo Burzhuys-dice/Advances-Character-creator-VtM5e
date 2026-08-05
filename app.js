@@ -540,7 +540,10 @@ function renderAttributes() {
         grid.innerHTML += colHTML;
     });
 }
-
+function updateSkillSpec(skillId, newValue) {
+    if (!state.skillSpecs) state.skillSpecs = {};
+    state.skillSpecs[skillId] = newValue;
+}
 function renderSkills() {
     const grid = document.getElementById('skills-grid');
     grid.innerHTML = '';
@@ -549,15 +552,43 @@ function renderSkills() {
         { key: 'social', label: 'Соціальні' },
         { key: 'mental', label: 'Ментальні' }
     ];
+
+    if (!state.skillSpecs) state.skillSpecs = {};
+
     categories.forEach(cat => {
-        let colHTML = `<div><h3 class="text-xl font-bold text-gray-800 border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-wider">${cat.label}</h3><div class="space-y-3">`;
+        let colHTML = `<div><h3 class="text-xl font-bold text-gray-800 border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-wider">${cat.label}</h3><div class="space-y-4">`;
         (skillsData[cat.key] || []).forEach(skill => {
-            let bonus = (state.predatorChoices.skill === skill.id) ? 1 : 0;
+            let isPredator = (state.predatorChoices.skill === skill.id);
+            let predSpec = isPredator ? state.predatorChoices.specName : "";
+            let manualSpec = state.skillSpecs[skill.id] || "";
+            
+            // Формуємо текст для поля: якщо є хижак, додаємо його спеціалізацію до того, що ввів юзер
+            let displaySpec = manualSpec;
+            if (isPredator && predSpec) {
+                if (!displaySpec) {
+                    displaySpec = predSpec;
+                } else if (!displaySpec.toLowerCase().includes(predSpec.toLowerCase())) {
+                    displaySpec = predSpec + ", " + displaySpec;
+                }
+            }
+
+            // Бонус від хижака тільки якщо в навичці рівно 0 крапок
+            let baseDots = state.skills[skill.id] || 0;
+            let bonus = (isPredator && baseDots === 0) ? 1 : 0;
             
             colHTML += `
-                <div class="flex justify-between items-center group">
-                    <span class="font-serif text-base text-gray-700 group-hover:text-[#8b0000] transition-colors">${skill.name}</span>
-                    ${createDotsHTML('skill', skill.id, state.skills[skill.id], 5, bonus)}
+                <div class="flex justify-between items-start group">
+                    <div class="flex flex-col pr-4 w-full">
+                        <span class="font-serif text-base text-gray-700 group-hover:text-[#8b0000] transition-colors">${skill.name}</span>
+                        ${skill.desc ? `<span class="text-[11px] text-gray-500 italic mt-0.5 leading-tight">${skill.desc}</span>` : ''}
+                        <input type="text" placeholder="Спеціалізація..." 
+                               value="${displaySpec}" 
+                               onchange="updateSkillSpec('${skill.id}', this.value)"
+                               class="mt-1 w-full bg-transparent border-b border-gray-200 px-1 py-0.5 text-[12px] text-gray-600 outline-none focus:border-[#8b0000] transition-colors placeholder:text-gray-300">
+                    </div>
+                    <div class="shrink-0 mt-0.5">
+                        ${createDotsHTML('skill', skill.id, baseDots, 5, bonus)}
+                    </div>
                 </div>
             `;
         });
@@ -943,43 +974,34 @@ function finishGen() {
     });
     summaryHTML += `</div></div>`;
 
-    // СЕКЦІЯ 3: НАВИЧКИ ТА СПЕЦІАЛІЗАЦІЇ (Вкладка 3)
-    let specAcademics = document.getElementById('spec-academics')?.value || '';
-    let specCraft = document.getElementById('spec-craft')?.value || '';
-    let specPerformance = document.getElementById('spec-performance')?.value || '';
-    let specScience = document.getElementById('spec-science')?.value || '';
-    let customSpecName = document.getElementById('spec-custom-name')?.value || '';
-    let customSpecSkill = document.getElementById('spec-custom-skill')?.value || '';
+  // СЕКЦІЯ 3: НАВИЧКИ ТА СПЕЦІАЛІЗАЦІЇ (Вкладка 3)
+    if (!state.skillSpecs) state.skillSpecs = {};
 
     summaryHTML += `
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 print:bg-transparent print:border-gray-300">
             <h3 class="text-xl font-bold text-[#8b0000] border-b-2 border-gray-200 pb-2 mb-4 uppercase tracking-widest vtm-font">3. Навички та Спеціалізації</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     `;
     cats.forEach(cat => {
         summaryHTML += `<div><h4 class="font-bold text-xs text-gray-400 uppercase mb-3">${cat.label}</h4><div class="space-y-2">`;
         (skillsData[cat.key] || []).forEach(skill => {
-            let totalDots = state.skills[skill.id] + (state.predatorChoices.skill === skill.id ? 1 : 0);
+            let isPred = (state.predatorChoices.skill === skill.id);
+            let baseD = state.skills[skill.id] || 0;
+            let bonusD = (isPred && baseD === 0) ? 1 : 0;
+            let totalDots = baseD + bonusD;
+            
             if (totalDots > 0) {
-                let specText = (state.predatorChoices.skill === skill.id && state.predatorChoices.specName) ? ` <span class="text-[10px] text-gray-500 font-normal">(${state.predatorChoices.specName})</span>` : '';
+                let specName = state.skillSpecs[skill.id] || '';
+                if (isPred && state.predatorChoices.specName && !specName.toLowerCase().includes(state.predatorChoices.specName.toLowerCase())) {
+                    specName = specName ? state.predatorChoices.specName + ', ' + specName : state.predatorChoices.specName;
+                }
+                let specText = specName ? ` <span class="text-[11px] text-gray-600 font-normal italic">(${specName})</span>` : '';
                 summaryHTML += `<div class="flex justify-between items-center text-sm border-b border-gray-100 pb-1"><span class="font-serif font-bold text-gray-800">${skill.name}${specText}</span> <span>${createSummaryDots(totalDots)}</span></div>`;
             }
         });
         summaryHTML += `</div></div>`;
     });
-    summaryHTML += `</div>`;
-
-    // Виведення спеціалізацій
-    summaryHTML += `
-        <div class="border-t border-gray-200 pt-4 text-xs text-gray-700 grid grid-cols-2 md:grid-cols-4 gap-4">
-            ${specAcademics ? `<div><strong>Знання:</strong> ${specAcademics}</div>` : ''}
-            ${specCraft ? `<div><strong>Ремесло:</strong> ${specCraft}</div>` : ''}
-            ${specPerformance ? `<div><strong>Виступ:</strong> ${specPerformance}</div>` : ''}
-            ${specScience ? `<div><strong>Наука:</strong> ${specScience}</div>` : ''}
-            ${customSpecName ? `<div class="col-span-full"><strong>Додаткова спец. (${customSpecSkill}):</strong> ${customSpecName}</div>` : ''}
-            ${state.predatorChoices.specName ? `<div class="col-span-full text-indigo-800"><strong>Спеціалізація хижака:</strong> ${state.predatorChoices.specName}</div>` : ''}
-        </div>
-    </div>`;
+    summaryHTML += `</div></div>`;
 
     // СЕКЦІЯ 4: ХИЖАЦЬКІ ЗВИЧКИ (Вкладка 4)
     summaryHTML += `
@@ -990,8 +1012,7 @@ function finishGen() {
                 ${predatorDesc ? `<p class="text-gray-600 text-xs italic">${predatorDesc}</p>` : ''}
                 ${predator && predator.advantages_text ? `<p class="mt-2 text-xs bg-indigo-50 p-2.5 rounded border border-indigo-100 text-indigo-900"><strong>Бонуси хижака:</strong> ${predator.advantages_text}</p>` : ''}
             </div>
-        </div>
-    `;
+        </div>`;
 
     // СЕКЦІЯ 5: ДИСЦИПЛІНИ ТА ЗДІБНОСТІ (Вкладка 5)
     summaryHTML += `
