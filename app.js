@@ -378,7 +378,6 @@ function renderPredatorAdvantagesInfo() {
                         <span class="w-2 h-2 bg-[#4b0082] rounded-full inline-block"></span> Бонус вашого хижака
                     </h4>
                     <p class="text-sm font-medium">${predator.advantages_text}</p>
-                    <p class="text-xs opacity-70 mt-1">Оберіть відповідні блага/вади зі списку нижче вручну, враховуючи цю вимогу.</p>
                 </div>
             `;
             infoDiv.classList.remove('hidden');
