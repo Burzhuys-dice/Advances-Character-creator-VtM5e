@@ -525,12 +525,7 @@ function renderDisciplines() {
         if(!state.disciplinePowers[discKey]) state.disciplinePowers[discKey] = {};
 
         // --- Візуальні точки для ритуалів/церемоній (неклікабельні) ---
-        let dotsHtml = '';
-        if (discKey === 'blood_sorcery_rituals' || discKey === 'oblivion_ceremonies') {
-            dotsHtml = `<div class="text-[#8b0000] text-xl tracking-widest cursor-default flex gap-1 items-center mt-1">${'●'.repeat(totalDots)}${'○'.repeat(5 - totalDots)}</div>`;
-        } else {
-            dotsHtml = createDotsHTML('discipline', discKey, baseDots, 5, bonus);
-        }
+        let dotsHtml = createDotsHTML('discipline', discKey, baseDots, 5, bonus);
         // --------------------------------------------------------------
 
         html += `
