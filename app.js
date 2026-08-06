@@ -486,19 +486,26 @@ function renderDisciplines() {
         });
     }
     
-    // --- НОВЕ: Інтеграція Чарів Крові та Ритуалів ---
+    // --- Інтеграція Чарів Крові та Ритуалів ---
     let bsTotalDots = (state.disciplines['blood_sorcery'] || 0) + (state.predatorChoices.discipline === 'blood_sorcery' ? 1 : 0);
-    
     if (bsTotalDots > 0) {
-        if (!availableDisc.includes('blood_sorcery_rituals')) {
-            availableDisc.push('blood_sorcery_rituals');
-        }
-        state.disciplines['blood_sorcery_rituals'] = bsTotalDots; // Синхронізація крапок
+        if (!availableDisc.includes('blood_sorcery_rituals')) availableDisc.push('blood_sorcery_rituals');
+        state.disciplines['blood_sorcery_rituals'] = bsTotalDots; 
     } else {
         availableDisc = availableDisc.filter(d => d !== 'blood_sorcery_rituals');
         state.disciplines['blood_sorcery_rituals'] = 0;
     }
-    // -------------------------------------------------
+    
+    // --- Інтеграція Забуття та Церемоній ---
+    let obTotalDots = (state.disciplines['oblivion'] || 0) + (state.predatorChoices.discipline === 'oblivion' ? 1 : 0);
+    if (obTotalDots > 0) {
+        if (!availableDisc.includes('oblivion_ceremonies')) availableDisc.push('oblivion_ceremonies');
+        state.disciplines['oblivion_ceremonies'] = obTotalDots; 
+    } else {
+        availableDisc = availableDisc.filter(d => d !== 'oblivion_ceremonies');
+        state.disciplines['oblivion_ceremonies'] = 0;
+    }
+    // ---------------------------------------
     
     let html = '<div class="space-y-6 bg-white p-6 border border-gray-200 rounded-lg">';
     
@@ -510,21 +517,21 @@ function renderDisciplines() {
         const discInfo = getDisciplineInfo(discKey);
         const ukrName = discInfo.name || discKey; 
         
-        // Для ритуалів бонус хижака не рахується повторно
-        let bonus = (discKey !== 'blood_sorcery_rituals' && state.predatorChoices.discipline === discKey) ? 1 : 0;
+        // Для ритуалів та церемоній бонус хижака не рахується повторно
+        let bonus = (discKey !== 'blood_sorcery_rituals' && discKey !== 'oblivion_ceremonies' && state.predatorChoices.discipline === discKey) ? 1 : 0;
         let baseDots = state.disciplines[discKey] || 0;
         let totalDots = baseDots + bonus;
         
         if(!state.disciplinePowers[discKey]) state.disciplinePowers[discKey] = {};
 
-        // --- НОВЕ: Візуальні точки для ритуалів (неклікабельні) ---
+        // --- Візуальні точки для ритуалів/церемоній (неклікабельні) ---
         let dotsHtml = '';
-        if (discKey === 'blood_sorcery_rituals') {
+        if (discKey === 'blood_sorcery_rituals' || discKey === 'oblivion_ceremonies') {
             dotsHtml = `<div class="text-[#8b0000] text-xl tracking-widest cursor-default flex gap-1 items-center mt-1">${'●'.repeat(totalDots)}${'○'.repeat(5 - totalDots)}</div>`;
         } else {
             dotsHtml = createDotsHTML('discipline', discKey, baseDots, 5, bonus);
         }
-        // ----------------------------------------------------------
+        // --------------------------------------------------------------
 
         html += `
             <div class="group border-b border-gray-100 pb-6 last:border-0 last:pb-0">
@@ -542,7 +549,6 @@ function renderDisciplines() {
             let powersList = disciplinesPowersMap[discKey] || [];
 
             for (let dotLevel = 1; dotLevel <= totalDots; dotLevel++) {
-                // Правило скалювання
                 let availablePowers = powersList.filter(p => Number(p.level) <= totalDots);
                 
                 let optionsHtml = `<option value="">-- Оберіть варіант (макс. рівень ${totalDots}) --</option>`;
@@ -569,8 +575,10 @@ function renderDisciplines() {
                     }
                 }
 
-                // Змінюємо підпис залежно від того, це дисципліна чи ритуал
-                let labelTitle = (discKey === 'blood_sorcery_rituals') ? `Ритуал ${dotLevel}` : `Здібність за ${dotLevel}-ю крапку`;
+                // Змінюємо підпис залежно від того, це дисципліна, ритуал чи церемонія
+                let labelTitle = `Здібність за ${dotLevel}-ю крапку`;
+                if (discKey === 'blood_sorcery_rituals') labelTitle = `Ритуал ${dotLevel}`;
+                if (discKey === 'oblivion_ceremonies') labelTitle = `Церемонія ${dotLevel}`;
 
                 html += `
                     <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
@@ -582,14 +590,11 @@ function renderDisciplines() {
                     </div>
                 `;
             }
-            // Закриваємо div з вибором здібностей
             html += `</div>`;
         }
-        // Закриваємо div з інформацією про дисципліну
         html += `</div>`;
     });
     
-    // Закриваємо загальний контейнер і виводимо результат
     html += '</div>';
     grid.innerHTML = html;
 }
@@ -941,9 +946,11 @@ function goToStep(step) {
 }
 
 function updateTrackers() {
-    const discCounts = { 2: 0, 1: 0 };
+const discCounts = { 2: 0, 1: 0 };
     Object.entries(state.disciplines).forEach(([key, val]) => {
-        if (key === 'blood_sorcery_rituals') return; // Ігноруємо ритуали для лічильника дисциплін
+        // Ігноруємо ритуали та церемонії для лічильника дисциплін
+        if (key === 'blood_sorcery_rituals' || key === 'oblivion_ceremonies') return; 
+        
         if (val === 2) discCounts[2]++;
         else if (val === 1) discCounts[1]++;
         else if (val > 2) discCounts[2]++;
@@ -1123,14 +1130,21 @@ function finishGen() {
     if (state.predatorChoices.discipline && !availableDisc.includes(state.predatorChoices.discipline)) {
         availableDisc.push(state.predatorChoices.discipline);
     }
-    if (state.manualDisciplines) {
+  if (state.manualDisciplines) {
         state.manualDisciplines.forEach(d => {
             if (!availableDisc.includes(d)) availableDisc.push(d);
         });
     }
+
+    // --- ДОДАННЯ У ПІДСУМОК (Ритуали та Церемонії) ---
     let bsTotalDots = (state.disciplines['blood_sorcery'] || 0) + (state.predatorChoices.discipline === 'blood_sorcery' ? 1 : 0);
     if (bsTotalDots > 0 && !availableDisc.includes('blood_sorcery_rituals')) {
         availableDisc.push('blood_sorcery_rituals');
+    }
+
+    let obTotalDots = (state.disciplines['oblivion'] || 0) + (state.predatorChoices.discipline === 'oblivion' ? 1 : 0);
+    if (obTotalDots > 0 && !availableDisc.includes('oblivion_ceremonies')) {
+        availableDisc.push('oblivion_ceremonies');
     }
     let hasDisciplines = false;
     availableDisc.forEach(discKey => {
