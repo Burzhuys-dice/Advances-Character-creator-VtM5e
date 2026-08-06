@@ -1441,8 +1441,8 @@
     "resistance": "Витривалість + окультизм/Стійкість"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "астромантія (Astromancy)",
     "level": 1,
     "requirement": "Немає",
@@ -1452,8 +1452,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "брись, Вельзевуле (Beelzebeatit)",
     "level": 1,
     "requirement": "Немає",
@@ -1463,8 +1463,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "зв’язати язик обвинувача (Bind the Accusing Tongue)",
     "level": 1,
     "requirement": "Немає",
@@ -1474,8 +1474,8 @@
     "resistance": "Витримка + Рішучість (Складність дорівнює Чарам Крові заклинача + 2)"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "шлях крові (Blood Walk)",
     "level": 1,
     "requirement": "Немає",
@@ -1485,8 +1485,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "криваве повідомлення (Bloody Message / Sanguine Tidings)",
     "level": 1,
     "requirement": "Немає",
@@ -1496,8 +1496,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "кров у воду (Blood to Water)",
     "level": 1,
     "requirement": "Немає",
@@ -1507,8 +1507,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "чіпкість комахи (Clinging of the Insect)",
     "level": 1,
     "requirement": "Немає",
@@ -1518,8 +1518,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "умовляння саду (Coax the Garden)",
     "level": 1,
     "requirement": "Немає (традиція Бахарі)",
@@ -1529,8 +1529,8 @@
     "resistance": "Спритність + Атлетика (Складність 3) для уникнення захоплення"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "створення кровокаменя (Craft Bloodstone)",
     "level": 1,
     "requirement": "Немає",
@@ -1540,8 +1540,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "гасіння страху (Douse the Fear / Dampen the Fear)",
     "level": 1,
     "requirement": "Немає",
@@ -1551,8 +1551,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "збагачення крові (Enrich the Blood)",
     "level": 1,
     "requirement": "Немає",
@@ -1562,8 +1562,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "захисний знак отари (Herd Ward)",
     "level": 1,
     "requirement": "Немає",
@@ -1573,8 +1573,8 @@
     "resistance": "Витривалість + Рішучість (Складність 4)"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "захисний знак листа (Letter Ward)",
     "level": 1,
     "requirement": "Немає",
@@ -1584,8 +1584,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "викриття багряного сліду (Revealing the Crimson Trail)",
     "level": 1,
     "requirement": "Немає",
@@ -1595,8 +1595,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "закріплення тавра (Seal the Brand)",
     "level": 1,
     "requirement": "Немає",
@@ -1606,8 +1606,8 @@
     "resistance": "Немає (завдає 1 легкого ушкодження цілі)"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "спільна пам’ять (Shared Memory)",
     "level": 1,
     "requirement": "Немає",
@@ -1617,8 +1617,8 @@
     "resistance": "Немає (потребує згоди суб'єкта)"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "пробудження з вечірньою бадьорістю (Wake with Evening’s Freshness)",
     "level": 1,
     "requirement": "Немає",
@@ -1628,8 +1628,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "захисний знак від гулів (Ward Against Ghouls)",
     "level": 1,
     "requirement": "Немає",
@@ -1639,8 +1639,8 @@
     "resistance": "Витривалість + Рішучість (для повторного дотику)"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "кровне послання (Blood Missive)",
     "level": 1,
     "requirement": "Немає",
@@ -1650,8 +1650,8 @@
     "resistance": "Кмітливість + Окультизм (Складність 3) для випадкових отримувачів"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "мов туман на воді (As Fog on Water)",
     "level": 4,
     "requirement": "Немає",
@@ -1661,8 +1661,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "спілкування з кревним сіром (Communicate with Kindred Sire)",
     "level": 1,
     "requirement": "Немає",
@@ -1672,8 +1672,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "посилення дискразії (Enhance Dyscrasia)",
     "level": 2,
     "requirement": "Немає",
@@ -1683,8 +1683,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "очі Вавилона (Eyes of Babel)",
     "level": 2,
     "requirement": "Немає",
@@ -1694,8 +1694,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "підсвічення сліду жертви (Illuminate the Trail of Prey)",
     "level": 2,
     "requirement": "Немає",
@@ -1705,8 +1705,8 @@
     "resistance": "Інтелект + Виживання (Складність 6 - надлишок) для відстеження"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "кров любові (Le Sang de l'Amour)",
     "level": 3,
     "requirement": "Немає",
@@ -1716,8 +1716,8 @@
     "resistance": "Витримка + Кмітливість"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "саван тиші (Shroud of Silence)",
     "level": 2,
     "requirement": "Немає",
@@ -1727,8 +1727,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "вкрадена пам'ять (Stolen Memory)",
     "level": 3,
     "requirement": "Немає",
@@ -1738,8 +1738,8 @@
     "resistance": "Рішучість + Витримка"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "Тіамат виблискує (Tiamat Glistens)",
     "level": 3,
     "requirement": "Шукач Тіамат (Seeking Tiamat)",
@@ -1749,8 +1749,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "правда крові (Truth of Blood)",
     "level": 2,
     "requirement": "Немає",
@@ -1760,8 +1760,8 @@
     "resistance": "Витримка + Окультизм"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "захисний знак від духів (Ward against Spirits)",
     "level": 3,
     "requirement": "Немає",
@@ -1771,8 +1771,8 @@
     "resistance": "Рішучість + Витримка духа"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "захисне коло від гулів (Warding Circle against Ghouls)",
     "level": 3,
     "requirement": "Захисний знак від гулів",
@@ -1782,8 +1782,8 @@
     "resistance": "Витривалість + Рішучість (для повторної спроби)"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "тенета голоду (Web of Hunger)",
     "level": 4,
     "requirement": "Погашення віте (Extinguish Vitae)",
@@ -1793,8 +1793,8 @@
     "resistance": "Стійкість + Витривалість"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "безкровний бенкет (Bloodless Feast)",
     "level": 3,
     "requirement": "Немає",
@@ -1804,8 +1804,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "кривавий символ (Blood Sigil)",
     "level": 2,
     "requirement": "Немає",
@@ -1815,8 +1815,8 @@
     "resistance": "Див. закладену силу"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "колективна енергія (Communal Vigor)",
     "level": 3,
     "requirement": "Немає",
@@ -1826,8 +1826,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "поклик Дагона (Dagon’s Call)",
     "level": 3,
     "requirement": "Немає",
@@ -1837,8 +1837,8 @@
     "resistance": "Витривалість + Рішучість"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "відбиття дерев’яної погибелі (Deflection of Wooden Doom)",
     "level": 3,
     "requirement": "Немає",
@@ -1848,8 +1848,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "елементальне укриття (Elemental Shelter)",
     "level": 2,
     "requirement": "Немає",
@@ -1859,8 +1859,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "есенція повітря (Essence of Air)",
     "level": 3,
     "requirement": "Немає",
@@ -1870,8 +1870,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "вогонь у крові (Fire in the Blood)",
     "level": 3,
     "requirement": "Немає",
@@ -1881,8 +1881,8 @@
     "resistance": "Витримка + Рішучість"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "ходіння крізь вогонь (Firewalker)",
     "level": 3,
     "requirement": "Немає",
@@ -1892,8 +1892,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "гальванічне руйнування (Galvanic Ruination)",
     "level": 3,
     "requirement": "Немає",
@@ -1903,8 +1903,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "лагідний розум (Gentle Mind)",
     "level": 2,
     "requirement": "Немає",
@@ -1914,8 +1914,8 @@
     "resistance": "Немає (потребує згоди цілі)"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "похмура лялечка (Grim Chrysalis)",
     "level": 3,
     "requirement": "Немає",
@@ -1925,8 +1925,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "непенте (Nepenthe)",
     "level": 2,
     "requirement": "Немає",
@@ -1936,8 +1936,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "бачення небесними очима (Seeing with the Sky's Eyes)",
     "level": 2,
     "requirement": "Немає",
@@ -1947,8 +1947,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "шукач Тіамат (Seeking Tiamat)",
     "level": 2,
     "requirement": "Немає",
@@ -1958,8 +1958,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "сон Юди (Sleep of Judas)",
     "level": 3,
     "requirement": "Немає",
@@ -1969,8 +1969,8 @@
     "resistance": "Витримка + Рішучість"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "душа гомункула (Soul of the Hemonculus)",
     "level": 1,
     "requirement": "Немає",
@@ -1980,8 +1980,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "камінь істинної форми (Stone of the True Form)",
     "level": 1,
     "requirement": "Немає",
@@ -1991,8 +1991,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "незрима зміна (The Unseen Change)",
     "level": 3,
     "requirement": "Немає",
@@ -2002,8 +2002,8 @@
     "resistance": "Витривалість + Рішучість"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "порушення меж (Trespass)",
     "level": 1,
     "requirement": "Немає",
@@ -2013,8 +2013,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "вірусний гаруспік (Viral Haruspex)",
     "level": 1,
     "requirement": "Немає",
@@ -2024,8 +2024,8 @@
     "resistance": "Немає"
   },
   {
-    "disc": "blood_sorcery",
-    "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
+    "disc": "blood_sorcery_rituals",
+      "discipline": "Ритуали Чарів Крові (Blood Sorcery Rituals)",
     "ability_name": "захисний знак від люпинів (Ward against Lupines)",
     "level": 3,
     "requirement": "Немає",
