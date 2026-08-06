@@ -542,10 +542,10 @@ function renderDisciplines() {
             let powersList = disciplinesPowersMap[discKey] || [];
 
             for (let dotLevel = 1; dotLevel <= totalDots; dotLevel++) {
-                // Здібності (і ритуали) фільтруються за <= поточного рівня
-                let availablePowers = powersList.filter(p => Number(p.level) <= dotLevel);
+                // Твоє існуюче правило скалювання
+                let availablePowers = powersList.filter(p => Number(p.level) <= totalDots);
                 
-                let optionsHtml = `<option value="">-- Оберіть здібність (макс. рівень ${dotLevel}) --</option>`;
+                let optionsHtml = `<option value="">-- Оберіть варіант (макс. рівень ${totalDots}) --</option>`;
                 availablePowers.forEach(p => {
                     let isSelected = state.disciplinePowers[discKey][dotLevel] === p.id;
                     let reqText = (p.requirement && String(p.requirement).trim().toLowerCase() !== 'немає' && String(p.requirement).trim() !== '') ? ` [Вимога: ${p.requirement}]` : '';
@@ -569,9 +569,12 @@ function renderDisciplines() {
                     }
                 }
 
+                // Змінюємо підпис залежно від того, це дисципліна чи ритуал
+                let labelTitle = (discKey === 'blood_sorcery_rituals') ? `Ритуал ${dotLevel}` : `Здібність за ${dotLevel}-ю крапку`;
+
                 html += `
                     <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
-                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">Здібність за ${dotLevel}-ю крапку</label>
+                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">${labelTitle}</label>
                         <select onchange="setDisciplinePower('${discKey}', ${dotLevel}, this.value)" class="w-full bg-gray-50 border border-gray-300 rounded px-2 py-1.5 text-sm font-semibold text-gray-800 outline-none focus:border-[#8b0000]">
                             ${optionsHtml}
                         </select>
@@ -579,14 +582,6 @@ function renderDisciplines() {
                     </div>
                 `;
             }
-            html += `</div>`;
-        }
-        
-        html += `</div>`;
-    });
-    html += '</div>';
-    grid.innerHTML = html;
-}
 
 function setDisciplinePower(discKey, dotLevel, powerId) {
     if(!state.disciplinePowers[discKey]) state.disciplinePowers[discKey] = {};
