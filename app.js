@@ -542,7 +542,7 @@ function renderDisciplines() {
             let powersList = disciplinesPowersMap[discKey] || [];
 
             for (let dotLevel = 1; dotLevel <= totalDots; dotLevel++) {
-                // Твоє існуюче правило скалювання
+                // Правило скалювання
                 let availablePowers = powersList.filter(p => Number(p.level) <= totalDots);
                 
                 let optionsHtml = `<option value="">-- Оберіть варіант (макс. рівень ${totalDots}) --</option>`;
@@ -582,6 +582,17 @@ function renderDisciplines() {
                     </div>
                 `;
             }
+            // Закриваємо div з вибором здібностей
+            html += `</div>`;
+        }
+        // Закриваємо div з інформацією про дисципліну
+        html += `</div>`;
+    });
+    
+    // Закриваємо загальний контейнер і виводимо результат
+    html += '</div>';
+    grid.innerHTML = html;
+}
 
 function setDisciplinePower(discKey, dotLevel, powerId) {
     if(!state.disciplinePowers[discKey]) state.disciplinePowers[discKey] = {};
