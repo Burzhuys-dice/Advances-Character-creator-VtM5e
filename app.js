@@ -486,6 +486,20 @@ function renderDisciplines() {
         });
     }
     
+    // --- НОВЕ: Інтеграція Чарів Крові та Ритуалів ---
+    let bsTotalDots = (state.disciplines['blood_sorcery'] || 0) + (state.predatorChoices.discipline === 'blood_sorcery' ? 1 : 0);
+    
+    if (bsTotalDots > 0) {
+        if (!availableDisc.includes('blood_sorcery_rituals')) {
+            availableDisc.push('blood_sorcery_rituals');
+        }
+        state.disciplines['blood_sorcery_rituals'] = bsTotalDots; // Синхронізація крапок
+    } else {
+        availableDisc = availableDisc.filter(d => d !== 'blood_sorcery_rituals');
+        state.disciplines['blood_sorcery_rituals'] = 0;
+    }
+    // -------------------------------------------------
+    
     let html = '<div class="space-y-6 bg-white p-6 border border-gray-200 rounded-lg">';
     
     if(availableDisc.length === 0) {
@@ -495,17 +509,28 @@ function renderDisciplines() {
     availableDisc.forEach(discKey => {
         const discInfo = getDisciplineInfo(discKey);
         const ukrName = discInfo.name || discKey; 
-        let bonus = (state.predatorChoices.discipline === discKey) ? 1 : 0;
+        
+        // Для ритуалів бонус хижака не рахується повторно
+        let bonus = (discKey !== 'blood_sorcery_rituals' && state.predatorChoices.discipline === discKey) ? 1 : 0;
         let baseDots = state.disciplines[discKey] || 0;
         let totalDots = baseDots + bonus;
         
         if(!state.disciplinePowers[discKey]) state.disciplinePowers[discKey] = {};
 
+        // --- НОВЕ: Візуальні точки для ритуалів (неклікабельні) ---
+        let dotsHtml = '';
+        if (discKey === 'blood_sorcery_rituals') {
+            dotsHtml = `<div class="text-[#8b0000] text-xl tracking-widest cursor-default flex gap-1 items-center mt-1">${'●'.repeat(totalDots)}${'○'.repeat(5 - totalDots)}</div>`;
+        } else {
+            dotsHtml = createDotsHTML('discipline', discKey, baseDots, 5, bonus);
+        }
+        // ----------------------------------------------------------
+
         html += `
             <div class="group border-b border-gray-100 pb-6 last:border-0 last:pb-0">
                 <div class="flex justify-between items-center mb-2">
                     <span class="font-serif text-xl font-bold text-gray-800 group-hover:text-[#8b0000] transition-colors">${ukrName}</span>
-                    ${createDotsHTML('discipline', discKey, baseDots, 5, bonus)}
+                    ${dotsHtml}
                 </div>
                 <p class="text-sm text-gray-500 text-justify leading-relaxed mb-4">${discInfo.desc || ''}</p>
         `;
@@ -517,9 +542,10 @@ function renderDisciplines() {
             let powersList = disciplinesPowersMap[discKey] || [];
 
             for (let dotLevel = 1; dotLevel <= totalDots; dotLevel++) {
-                let availablePowers = powersList.filter(p => Number(p.level) <= totalDots);
+                // Здібності (і ритуали) фільтруються за <= поточного рівня
+                let availablePowers = powersList.filter(p => Number(p.level) <= dotLevel);
                 
-                let optionsHtml = `<option value="">-- Оберіть здібність (макс. рівень ${totalDots}) --</option>`;
+                let optionsHtml = `<option value="">-- Оберіть здібність (макс. рівень ${dotLevel}) --</option>`;
                 availablePowers.forEach(p => {
                     let isSelected = state.disciplinePowers[discKey][dotLevel] === p.id;
                     let reqText = (p.requirement && String(p.requirement).trim().toLowerCase() !== 'немає' && String(p.requirement).trim() !== '') ? ` [Вимога: ${p.requirement}]` : '';
@@ -910,7 +936,8 @@ function goToStep(step) {
 
 function updateTrackers() {
     const discCounts = { 2: 0, 1: 0 };
-    Object.values(state.disciplines).forEach(val => {
+    Object.entries(state.disciplines).forEach(([key, val]) => {
+        if (key === 'blood_sorcery_rituals') return; // Ігноруємо ритуали для лічильника дисциплін
         if (val === 2) discCounts[2]++;
         else if (val === 1) discCounts[1]++;
         else if (val > 2) discCounts[2]++;
@@ -1095,7 +1122,10 @@ function finishGen() {
             if (!availableDisc.includes(d)) availableDisc.push(d);
         });
     }
-
+    let bsTotalDots = (state.disciplines['blood_sorcery'] || 0) + (state.predatorChoices.discipline === 'blood_sorcery' ? 1 : 0);
+    if (bsTotalDots > 0 && !availableDisc.includes('blood_sorcery_rituals')) {
+        availableDisc.push('blood_sorcery_rituals');
+    }
     let hasDisciplines = false;
     availableDisc.forEach(discKey => {
         let totalDots = (state.disciplines[discKey] || 0) + (state.predatorChoices.discipline === discKey ? 1 : 0);
