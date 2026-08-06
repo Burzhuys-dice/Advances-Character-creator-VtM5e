@@ -5,7 +5,7 @@
     "desc": "Ви не знаєте свого походження або належите до Каїтифів (безкланових). Ваш Звір не має специфічного прокляття, але ви позбавлені кланової підтримки. Ви можете обрати будь-які дисципліни.",
     "clan_compultion": "Відсутнє",
     "clan_bane": "Відсутнє",
-    "disciplines": ["animalism", "auspex", "blood_sorcery", "celerity", "dominate", "fortitude", "obfuscate", "potence", "presence", "protean"]
+    "disciplines": ["animalism", "auspex", "celerity", "dominate", "fortitude", "obfuscate", "potence", "presence", "protean", "blood_sorcery", "oblivion"]
   },
   {
   "id": "brujah",
