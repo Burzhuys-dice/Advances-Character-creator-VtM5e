@@ -1226,4 +1226,15 @@ function createSummaryDots(count, max = 5) {
     return html;
 }
 
+// Обирає випадковий клан зі списку та оновлює форму
+function setRandomClan() {
+    const select = document.getElementById('clan-select-1');
+    if (!select || select.options.length === 0) return;
+    
+    const randomIndex = Math.floor(Math.random() * select.options.length);
+    select.selectedIndex = randomIndex;
+    
+    // Викликаємо існуючу функцію зміни клану, щоб оновити дисципліни та опис
+    changeClan(select.value);
+}
 window.addEventListener('DOMContentLoaded', init);
