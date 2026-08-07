@@ -852,17 +852,28 @@ function populateClanSelects() {
     for (const [key, data] of Object.entries(clansData)) {
         optionsHTML += `<option value="${key}">${data.name}</option>`;
     }
-    document.getElementById('clan-select-1').innerHTML = optionsHTML;
-    document.getElementById('clan-select-4').innerHTML = optionsHTML;
+    
+    // Безпечне присвоєння: перевіряємо, чи є елементи на сторінці
+    const select1 = document.getElementById('clan-select-1');
+    const select4 = document.getElementById('clan-select-4');
+    
+    if (select1) select1.innerHTML = optionsHTML;
+    if (select4) select4.innerHTML = optionsHTML;
 }
 
 function changeClan(clanId) {
     state.clan = clanId;
-    document.getElementById('clan-select-1').value = clanId;
-    document.getElementById('clan-select-4').value = clanId;
+    
+    // Безпечне присвоєння значень
+    const select1 = document.getElementById('clan-select-1');
+    const select4 = document.getElementById('clan-select-4');
+    if (select1) select1.value = clanId;
+    if (select4) select4.value = clanId;
     
     const clanInfo = clansData[clanId] || {};
-    document.getElementById('clan-desc-1').innerText = clanInfo.desc || '';
+    
+    const desc1 = document.getElementById('clan-desc-1');
+    if (desc1) desc1.innerText = clanInfo.desc || '';
     
     const compulsionContainer = document.getElementById('clan-compulsion-container');
     const compulsionText = document.getElementById('clan-compulsion-text');
