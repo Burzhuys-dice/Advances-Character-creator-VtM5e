@@ -22,10 +22,13 @@ async function init() {
     updateTrackers();
     updateHumanityDisplay();
     
+    // Переносимо виклик сюди, коли всі поля вже точно існують у DOM
     updateHeaderInfo();
-    document.getElementById('character-name').addEventListener('input', updateHeaderInfo);
     
-    document.getElementById('loading-status').innerText = 'Крок за кроком (Дані завантажено)';
+    document.getElementById('character-name')?.addEventListener('input', updateHeaderInfo);
+    
+    const loadingStatus = document.getElementById('loading-status');
+    if (loadingStatus) loadingStatus.innerText = 'Крок за кроком (Дані завантажено)';
 }
 
 async function fetchAllData() {
