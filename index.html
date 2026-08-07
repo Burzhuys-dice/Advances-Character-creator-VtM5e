@@ -66,23 +66,7 @@
                     <label class="block text-sm font-bold text-gray-700 uppercase tracking-wider mb-2">Концепт (Коротка фраза)</label>
                     <input type="text" id="concept-phrase" placeholder="Наприклад: Колишній детектив, що шукає свого вбивцю..." class="custom-input text-xl w-full border border-gray-300 rounded p-2">
                 </div>
-<div class="flex items-center gap-2 mb-1">
-    <label for="character-name" class="block text-sm font-medium text-gray-700">Ім'я</label>
-    
-    <!-- Початок блоку підказки -->
-    <div class="relative flex items-center group">
-        <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors cursor-help">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        </button>
-        <!-- Випадаюче вікно -->
-        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-2.5 bg-gray-900 text-white text-xs leading-relaxed rounded-md shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-50">
-            Введіть ім'я вашого персонажа, яким він користується серед смертних або у Світі Темряви.
-            <!-- Трикутник-стрілочка вниз -->
-            <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
-        </div>
-    </div>
-<!-- Тут твій існуючий <input id="character-name" ...> -->
-                
+<!-- ================= БЛОК КЛАНУ ================= -->
 <div class="mt-4">
     <div class="flex items-center justify-between mb-1">
         <div class="flex items-center gap-2">
@@ -97,17 +81,13 @@
                     <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
                 </div>
             </div>
-
         </div>
         <button type="button" onclick="setRandomClan()" class="px-3 py-1 text-[11px] font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-[#8b0000] border border-gray-300 rounded transition-colors uppercase tracking-widest">
             Випадковий клан
         </button>
     </div>
 
-    <!-- МЕНЮ -->
-    <select id="clan-select-1" onchange="changeClan(this.value)" class="custom-input text-xl w-full border border-gray-300 rounded p-2">
-    </select>
-
+    <select id="clan-select-1" onchange="changeClan(this.value)" class="custom-input text-xl w-full border border-gray-300 rounded p-2"></select>
     <p id="clan-desc-1" class="text-sm text-gray-600 mt-2 italic text-justify leading-relaxed"></p>
     
     <div id="clan-compulsion-container" class="hidden mt-3 bg-red-50 p-3 rounded-lg border border-red-100">
@@ -120,42 +100,72 @@
         <p id="clan-bane-text" class="text-sm text-gray-800"></p>
     </div>
 </div>
-    
-<div class="flex items-center gap-2 mb-1 mt-4">
-    <label for="concept-bg" class="block text-sm font-medium text-gray-700 uppercase tracking-widest">Історія (Фон)</label>
-    
-    <div class="relative flex items-center group">
-        <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors cursor-help">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        </button>
-        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-2.5 bg-gray-900 text-white text-xs leading-relaxed rounded-md shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-50">
-            Коротко опишіть, ким був ваш персонаж за життя (до Становлення), чим він займався і за яких обставин перетворився на вампіра.
-            <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+
+<!-- ================= БЛОК ІСТОРІЇ ================= -->
+<div class="mt-4">
+    <div class="flex items-center gap-2 mb-1">
+        <label for="concept-bg" class="block text-sm font-medium text-gray-700 uppercase tracking-widest">Історія (Фон)</label>
+        
+        <div class="relative flex items-center group">
+            <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors cursor-help">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </button>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-2.5 bg-gray-900 text-white text-xs leading-relaxed rounded-md shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-50">
+                Коротко опишіть, ким був ваш персонаж за життя, чим він займався і за яких обставин перетворився на вампіра.
+                <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+            </div>
         </div>
     </div>
+    <textarea id="concept-bg" rows="4" class="custom-input w-full border border-gray-300 rounded p-2 text-sm leading-relaxed" placeholder="Ваша історія..."></textarea>
 </div>
-    
-<div class="flex items-center gap-2 mb-1">
-    <label for="conviction1" class="block text-sm font-medium text-gray-700">Переконання 1</label>
-    
-    <div class="relative flex items-center group z-50">
-        <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors cursor-help">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        </button>
-        <div class="absolute bottom-full left-0 mb-2 w-72 p-3 bg-gray-900 text-white text-xs leading-relaxed rounded-md shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
-            <span class="font-bold text-red-400">Переконання</span> — це ключові моральні принципи, що допомагають вампіру стримувати внутрішнього Звіра.<br><br>
-            <span class="font-bold text-red-400">Опора</span> — це жива людина, яка уособлює або пов'язана з цим переконанням.
-            <div class="absolute top-full left-4 border-4 border-transparent border-t-gray-900"></div>
+
+<!-- ================= БЛОК ПЕРЕКОНАНЬ ================= -->
+<div class="grid grid-cols-2 gap-4 mt-6">
+    <!-- Пара 1 -->
+    <div>
+        <div class="flex items-center gap-2 mb-1">
+            <label for="conviction1" class="block text-sm font-medium text-gray-700">Переконання 1</label>
+            <div class="relative flex items-center group z-40">
+                <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors cursor-help">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </button>
+                <div class="absolute bottom-full left-0 mb-2 w-72 p-3 bg-gray-900 text-white text-xs leading-relaxed rounded-md shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
+                    <span class="font-bold text-red-400">Переконання</span> — це ключові моральні принципи, що стримують Звіра.<br><br>
+                    <span class="font-bold text-red-400">Опора</span> — жива людина, яка уособлює це переконання.
+                    <div class="absolute top-full left-4 border-4 border-transparent border-t-gray-900"></div>
+                </div>
+            </div>
         </div>
+        <textarea id="conviction1" name="conviction1" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="Перше переконання..."></textarea>
     </div>
-</div>
-    
     <div>
         <label for="touchstone1" class="block text-sm font-medium text-gray-700 mb-1">Опора 1</label>
         <textarea id="touchstone1" name="touchstone1" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="Опора для першого переконання..."></textarea>
     </div>
+
+    <!-- Пара 2 -->
+    <div>
+        <div class="flex items-center gap-2 mb-1">
+            <label for="conviction2" class="block text-sm font-medium text-gray-700">Переконання 2</label>
+            <div class="relative flex items-center group z-30">
+                <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors cursor-help">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </button>
+                <div class="absolute bottom-full left-0 mb-2 w-64 p-2.5 bg-gray-900 text-white text-xs leading-relaxed rounded-md shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
+                    Друге фундаментальне правило вашого персонажа, що допомагає чіплятися за залишки Людяності.
+                    <div class="absolute top-full left-4 border-4 border-transparent border-t-gray-900"></div>
+                </div>
+            </div>
+        </div>
+        <textarea id="conviction2" name="conviction2" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="Друге переконання..."></textarea>
+    </div>
+    <div>
+        <label for="touchstone2" class="block text-sm font-medium text-gray-700 mb-1">Опора 2</label>
+        <textarea id="touchstone2" name="touchstone2" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="Опора для другого переконання..."></textarea>
+    </div>
 </div>
-<div class="flex gap-4 mt-2">
+
+<div class="flex gap-4 mt-3">
     <button type="button" id="btn-random-conviction1" class="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md border border-gray-300">
         Випадкове Переконання 1
     </button>
@@ -163,28 +173,6 @@
         Випадкове Переконання 2
     </button>
 </div>
-<div class="flex items-center gap-2 mb-1">
-    <label for="conviction2" class="block text-sm font-medium text-gray-700">Переконання 2</label>
-    
-    <div class="relative flex items-center group z-50">
-        <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors cursor-help">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        </button>
-        <div class="absolute bottom-full left-0 mb-2 w-64 p-2.5 bg-gray-900 text-white text-xs leading-relaxed rounded-md shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
-            Друге фундаментальне правило вашого персонажа, що допомагає чіплятися за залишки Людяності.
-            <div class="absolute top-full left-4 border-4 border-transparent border-t-gray-900"></div>
-        </div>
-    </div>
-</div>
-                
-    <div>
-        <label for="touchstone2" class="block text-sm font-medium text-gray-700 mb-1">Опора 2</label>
-        <textarea id="touchstone2" name="touchstone2" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="Опора для другого переконання..."></textarea>
-    </div>
-</div>
-            <div class="mt-8 flex justify-end">
-                <button onclick="goToStep(2)" class="px-6 py-2 bg-[#1a1a1a] text-white font-bold uppercase tracking-widest text-sm hover:bg-[#8b0000] transition-colors rounded shadow">Далі ➔</button>
-            </div>
         </section>
 
         <!-- STEP 2: ATTRIBUTES -->
