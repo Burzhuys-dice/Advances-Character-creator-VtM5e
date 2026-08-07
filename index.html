@@ -68,37 +68,46 @@
                 </div>
 <div class="flex items-center gap-2 mb-1">
     <label for="character-name" class="block text-sm font-medium text-gray-700">Ім'я</label>
-    <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors" 
-            title="Ім'я персонажа у Світі Темряви" 
-            onclick="alert('Введіть ім\'я вашого персонажа, яким він користується серед смертних або у Світі Темряви.')">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-    </button>
-</div>
+    
+    <!-- Початок блоку підказки -->
+    <div class="relative flex items-center group">
+        <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors cursor-help">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </button>
+        <!-- Випадаюче вікно -->
+        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-2.5 bg-gray-900 text-white text-xs leading-relaxed rounded-md shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-50">
+            Введіть ім'я вашого персонажа, яким він користується серед смертних або у Світі Темряви.
+            <!-- Трикутник-стрілочка вниз -->
+            <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+        </div>
+    </div>
 <!-- Тут твій існуючий <input id="character-name" ...> -->
                 
 <div class="mt-4">
-    <!-- Заголовок з іконкою довідки та кнопкою рандому -->
     <div class="flex items-center justify-between mb-1">
         <div class="flex items-center gap-2">
             <label for="clan-select-1" class="block text-sm font-medium text-gray-700 uppercase tracking-widest">Клан</label>
-            <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors" 
-                    title="Інформація про клан" 
-                    onclick="alert('Клан — це родовід вашого вампіра. Він визначає ваші стартові дисципліни (здібності) та унікальне прокляття (ваду).')">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </button>
+            
+            <div class="relative flex items-center group">
+                <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors cursor-help">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </button>
+                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-2.5 bg-gray-900 text-white text-xs leading-relaxed rounded-md shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-50">
+                    Клан — це родовід вашого вампіра. Він визначає ваші стартові дисципліни (здібності) та унікальне прокляття (ваду).
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                </div>
+            </div>
+
         </div>
-        <!-- Кнопка Випадковий клан -->
         <button type="button" onclick="setRandomClan()" class="px-3 py-1 text-[11px] font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-[#8b0000] border border-gray-300 rounded transition-colors uppercase tracking-widest">
             Випадковий клан
         </button>
     </div>
 
-    <!-- САМЕ МЕНЮ (якщо воно було видалене, скрипту не було куди завантажувати клани) -->
+    <!-- МЕНЮ -->
     <select id="clan-select-1" onchange="changeClan(this.value)" class="custom-input text-xl w-full border border-gray-300 rounded p-2">
-        <!-- Опції генеруються через app.js -->
     </select>
 
-    <!-- Опис клану, примус та прокляття -->
     <p id="clan-desc-1" class="text-sm text-gray-600 mt-2 italic text-justify leading-relaxed"></p>
     
     <div id="clan-compulsion-container" class="hidden mt-3 bg-red-50 p-3 rounded-lg border border-red-100">
@@ -111,22 +120,36 @@
         <p id="clan-bane-text" class="text-sm text-gray-800"></p>
     </div>
 </div>
+    
 <div class="flex items-center gap-2 mb-1 mt-4">
     <label for="concept-bg" class="block text-sm font-medium text-gray-700 uppercase tracking-widest">Історія (Фон)</label>
-    <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors" 
-            title="Історія до Становлення" 
-            onclick="alert('Коротко опишіть, ким був ваш персонаж за життя (до Становлення), чим він займався і за яких обставин перетворився на вампіра.')">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-    </button>
+    
+    <div class="relative flex items-center group">
+        <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors cursor-help">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </button>
+        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-2.5 bg-gray-900 text-white text-xs leading-relaxed rounded-md shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-50">
+            Коротко опишіть, ким був ваш персонаж за життя (до Становлення), чим він займався і за яких обставин перетворився на вампіра.
+            <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+        </div>
+    </div>
 </div>
-            </div>
+    
 <div class="flex items-center gap-2 mb-1">
     <label for="conviction1" class="block text-sm font-medium text-gray-700">Переконання 1</label>
-    <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors" 
-            onclick="alert('Переконання — це ключові моральні принципи, що допомагають вампіру стримувати внутрішнього Звіра та не втрачати Людяність.\nОпора — це жива людина, яка уособлює або пов\'язана з цим переконанням.')">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-    </button>
+    
+    <div class="relative flex items-center group z-50">
+        <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors cursor-help">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </button>
+        <div class="absolute bottom-full left-0 mb-2 w-72 p-3 bg-gray-900 text-white text-xs leading-relaxed rounded-md shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
+            <span class="font-bold text-red-400">Переконання</span> — це ключові моральні принципи, що допомагають вампіру стримувати внутрішнього Звіра.<br><br>
+            <span class="font-bold text-red-400">Опора</span> — це жива людина, яка уособлює або пов'язана з цим переконанням.
+            <div class="absolute top-full left-4 border-4 border-transparent border-t-gray-900"></div>
+        </div>
+    </div>
 </div>
+    
     <div>
         <label for="touchstone1" class="block text-sm font-medium text-gray-700 mb-1">Опора 1</label>
         <textarea id="touchstone1" name="touchstone1" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="Опора для першого переконання..."></textarea>
@@ -142,11 +165,18 @@
 </div>
 <div class="flex items-center gap-2 mb-1">
     <label for="conviction2" class="block text-sm font-medium text-gray-700">Переконання 2</label>
-    <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors" 
-            onclick="alert('Друге фундаментальне правило вашого персонажа, що допомагає чіплятися за залишки Людяності.')">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-    </button>
+    
+    <div class="relative flex items-center group z-50">
+        <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors cursor-help">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </button>
+        <div class="absolute bottom-full left-0 mb-2 w-64 p-2.5 bg-gray-900 text-white text-xs leading-relaxed rounded-md shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
+            Друге фундаментальне правило вашого персонажа, що допомагає чіплятися за залишки Людяності.
+            <div class="absolute top-full left-4 border-4 border-transparent border-t-gray-900"></div>
+        </div>
+    </div>
 </div>
+                
     <div>
         <label for="touchstone2" class="block text-sm font-medium text-gray-700 mb-1">Опора 2</label>
         <textarea id="touchstone2" name="touchstone2" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="Опора для другого переконання..."></textarea>
