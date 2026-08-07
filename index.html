@@ -76,33 +76,41 @@
 </div>
 <!-- Тут твій існуючий <input id="character-name" ...> -->
                 
-<div class="flex items-center justify-between mb-1 mt-4">
-    <div class="flex items-center gap-2">
-        <label for="clan-select-1" class="block text-sm font-medium text-gray-700 uppercase tracking-widest">Клан</label>
-        <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors" 
-                title="Інформація про клан" 
-                onclick="alert('Клан — це родовід вашого вампіра. Він визначає ваші стартові дисципліни (здібності) та унікальне прокляття (ваду).')">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+<div class="mt-4">
+    <!-- Заголовок з іконкою довідки та кнопкою рандому -->
+    <div class="flex items-center justify-between mb-1">
+        <div class="flex items-center gap-2">
+            <label for="clan-select-1" class="block text-sm font-medium text-gray-700 uppercase tracking-widest">Клан</label>
+            <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors" 
+                    title="Інформація про клан" 
+                    onclick="alert('Клан — це родовід вашого вампіра. Він визначає ваші стартові дисципліни (здібності) та унікальне прокляття (ваду).')">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </button>
+        </div>
+        <!-- Кнопка Випадковий клан -->
+        <button type="button" onclick="setRandomClan()" class="px-3 py-1 text-[11px] font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-[#8b0000] border border-gray-300 rounded transition-colors uppercase tracking-widest">
+            Випадковий клан
         </button>
     </div>
-    <!-- Кнопка Випадковий клан -->
-    <button type="button" onclick="setRandomClan()" class="px-3 py-1 text-[11px] font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-[#8b0000] border border-gray-300 rounded transition-colors uppercase tracking-widest">
-        Випадковий клан
-    </button>
+
+    <!-- САМЕ МЕНЮ (якщо воно було видалене, скрипту не було куди завантажувати клани) -->
+    <select id="clan-select-1" onchange="changeClan(this.value)" class="custom-input text-xl w-full border border-gray-300 rounded p-2">
+        <!-- Опції генеруються через app.js -->
+    </select>
+
+    <!-- Опис клану, примус та прокляття -->
+    <p id="clan-desc-1" class="text-sm text-gray-600 mt-2 italic text-justify leading-relaxed"></p>
+    
+    <div id="clan-compulsion-container" class="hidden mt-3 bg-red-50 p-3 rounded-lg border border-red-100">
+        <h4 class="text-xs font-bold text-red-800 uppercase tracking-widest mb-1">Клановий примус</h4>
+        <p id="clan-compulsion-text" class="text-sm text-red-900"></p>
+    </div>
+    
+    <div id="clan-bane-container" class="hidden mt-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-widest mb-1">Кланове прокляття</h4>
+        <p id="clan-bane-text" class="text-sm text-gray-800"></p>
+    </div>
 </div>
-<!-- Тут твій існуючий <select id="clan-select-1" ...> -->
-                    
-                    <div id="clan-compulsion-container" class="p-3 bg-red-50 border-l-4 border-[#8b0000] rounded-r text-sm hidden">
-                        <span class="font-bold text-[#8b0000] uppercase text-[10px] tracking-widest block mb-1">Клановий примус (Clan Compulsion)</span>
-                        <p id="clan-compulsion-text" class="text-gray-800 leading-relaxed text-justify"></p>
-                    </div>
-
-                    <div id="clan-bane-container" class="p-3 bg-gray-900 text-white border-l-4 border-red-600 rounded-r text-sm hidden">
-                        <span class="font-bold text-red-500 uppercase text-[10px] tracking-widest block mb-1">Кланове прокляття (Clan Bane)</span>
-                        <p id="clan-bane-text" class="text-gray-200 leading-relaxed text-justify"></p>
-                    </div>
-                </div>
-
 <div class="flex items-center gap-2 mb-1 mt-4">
     <label for="concept-bg" class="block text-sm font-medium text-gray-700 uppercase tracking-widest">Історія (Фон)</label>
     <button type="button" class="text-gray-400 hover:text-[#8b0000] transition-colors" 
